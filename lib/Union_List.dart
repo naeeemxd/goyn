@@ -5,21 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:goyn/Driver_List.dart';
 import 'package:goyn/Union_Registration.dart';
 
-// Union model class
-
-class GoynHomePage extends StatelessWidget {
-  const GoynHomePage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => UnionProvider(),
-      child: _GoynHomePageContent(),
-    );
-  }
-}
-
-class _GoynHomePageContent extends StatelessWidget {
+class GoynHomePageContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final unionProvider = Provider.of<UnionProvider>(context);
@@ -50,6 +36,7 @@ class _GoynHomePageContent extends StatelessWidget {
         ),
       ),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Image.asset("assets/images/logo.png", width: 120, height: 40),
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,

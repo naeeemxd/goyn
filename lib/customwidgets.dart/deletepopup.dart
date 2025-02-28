@@ -106,7 +106,6 @@ class ConfirmationDialog extends StatelessWidget {
     );
   }
 }
-
 void showDeleteConfirmationDialog(BuildContext context) {
   showDialog(
     context: context,

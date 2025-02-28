@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:goyn/Union_List.dart';
 import 'package:goyn/login_screen.dart';
-import 'package:goyn/otp_verification_screen.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});

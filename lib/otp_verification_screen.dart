@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:goyn/Union_List.dart';
-import 'package:goyn/customwidgets.dart/color.dart';
+import 'package:goyn/customwidgets.dart/CustomAppBar.dart';
 import 'package:goyn/customwidgets.dart/custom_button.dart';
 import 'package:goyn/customwidgets.dart/otp_textfield.dart';
 
@@ -19,32 +18,7 @@ class OtpVerificationScreen extends StatelessWidget {
       resizeToAvoidBottomInset: true,
 
       backgroundColor: Colors.white,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80),
-        child: Padding(
-          padding: const EdgeInsets.only(top: 10.0),
-          child: AppBar(
-            backgroundColor: Color(0x08000000),
-            surfaceTintColor: Colors.transparent,
-            elevation: 1,
-            title: const Text(
-              'Driver Details',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 19,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            centerTitle: true,
-            leading: IconButton(
-              icon: SvgPicture.asset("assets/icons/back_arrow.svg"),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ),
-        ),
-      ),
+      appBar: CustomAppBar(title: "Otp Verification"),
       body: SingleChildScrollView(
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),
@@ -95,16 +69,24 @@ class OtpVerificationScreen extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
+                        Text(
+                          " resend in 00:05",
+                          style: GoogleFonts.openSans(
+                            fontSize: 12,
+                            color: Color(0xFFF0AC00),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ],
                     ),
-                    SizedBox(height: height * 0.04),
+                    SizedBox(height: height * 0.03),
                     CustomButton(
                       title: "Verify",
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => GoynHomePage(),
+                            builder: (context) => GoynHomePageContent(),
                           ),
                         );
                       },

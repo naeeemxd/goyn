@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:goyn/Driver_Registration.dart';
+import 'package:goyn/customwidgets.dart/CustomAppBar.dart';
 import 'package:goyn/provider/DriverlistProvider.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,32 +11,7 @@ class DriverList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80),
-        child: Padding(
-          padding: const EdgeInsets.only(top: 10.0),
-          child: AppBar(
-            backgroundColor: Color(0x08000000),
-            surfaceTintColor: Colors.transparent,
-            elevation: 1,
-            title: const Text(
-              'Union',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 19,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            centerTitle: true,
-            leading: IconButton(
-              icon: SvgPicture.asset("assets/icons/back_arrow.svg"),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ),
-        ),
-      ),
+      appBar: CustomAppBar(title: "Union"),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.push(

@@ -1,26 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:goyn/customwidgets.dart/CustomAppBar.dart';
 import 'package:goyn/customwidgets.dart/deletepopup.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.amber,
-        scaffoldBackgroundColor: Colors.white,
-      ),
-      home: const DriverDetailsPage(),
-    );
-  }
-}
 
 class DriverDetailsPage extends StatelessWidget {
   const DriverDetailsPage({Key? key}) : super(key: key);
@@ -28,32 +9,7 @@ class DriverDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80),
-        child: Padding(
-          padding: const EdgeInsets.only(top: 10.0),
-          child: AppBar(
-            backgroundColor: Color(0x08000000),
-            surfaceTintColor: Colors.transparent,
-            elevation: 1,
-            title: const Text(
-              'Driver Details',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 19,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            centerTitle: true,
-            leading: IconButton(
-              icon: SvgPicture.asset("assets/icons/back_arrow.svg"),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ),
-        ),
-      ),
+      appBar: CustomAppBar(title: "Driver Details"),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -117,14 +73,14 @@ class DriverDetailsPage extends StatelessWidget {
                             side: const BorderSide(color: Colors.grey),
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(15),
                             ),
                           ),
                           child: const Text(
                             'Delete',
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w800,
                               color: Colors.red,
                             ),
                           ),
@@ -143,14 +99,14 @@ class DriverDetailsPage extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             elevation: 0,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(15),
                             ),
                           ),
                           child: const Text(
                             'Edit',
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w800,
                               color: Colors.white,
                             ),
                           ),

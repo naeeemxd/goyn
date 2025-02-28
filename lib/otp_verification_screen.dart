@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:goyn/Union_List.dart';
+import 'package:goyn/Union/Union_List.dart';
 import 'package:goyn/customwidgets.dart/CustomAppBar.dart';
 import 'package:goyn/customwidgets.dart/custom_button.dart';
 import 'package:goyn/customwidgets.dart/otp_textfield.dart';

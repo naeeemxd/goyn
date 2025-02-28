@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:goyn/Driver_Registration.dart';
+import 'package:goyn/Driver/Driver_Details.dart';
+import 'package:goyn/Driver/Driver_Registration.dart';
 import 'package:goyn/customwidgets.dart/CustomAppBar.dart';
 import 'package:goyn/provider/DriverlistProvider.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'Driver_details.dart';
 
 class DriverList extends StatelessWidget {
   @override

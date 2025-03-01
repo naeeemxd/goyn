@@ -9,6 +9,7 @@ import 'package:goyn/provider/Login_Provider.dart';
 import 'package:goyn/provider/Union_Provider.dart';
 import 'package:provider/provider.dart';
 import 'package:goyn/splash_screen.dart';
+import 'package:goyn/Union/Union_List.dart'; // Import your home page
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,7 +30,8 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(create: (context) => FilterProvider()),
         ChangeNotifierProvider(create: (_) => DriverlistProvider()),
-        ChangeNotifierProvider(create: (_) => UnionProvider()),
+        // ChangeNotifierProvider(create: (_) => UnionProvider()), // Uncommented this line
+        ChangeNotifierProvider(create: (_) => SearchProvider()),
         ChangeNotifierProvider(create: (_) => RegistrationProvider()),
         ChangeNotifierProvider(create: (_) => DropdownProvider()),
       ],
@@ -40,7 +42,12 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.white,
           fontFamily: GoogleFonts.openSans().fontFamily,
         ),
-        home: const SplashScreen(),
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const SplashScreen(),
+          '/home': (context) => const GoynHomePageContent(),
+          // Add other routes as needed
+        },
         builder: (context, child) {
           return MediaQuery(
             data: MediaQuery.of(

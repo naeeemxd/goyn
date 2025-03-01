@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:goyn/customwidgets.dart/countryCodeDropDown.dart';
 import 'package:goyn/provider/Login_Provider.dart';
-import 'package:provider/provider.dart';
 import 'package:goyn/customwidgets.dart/country_codes.dart';
 import 'package:goyn/customwidgets.dart/custom_button.dart';
 import 'package:goyn/customwidgets.dart/custom_textfield.dart';
@@ -15,9 +16,9 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-
     final TextEditingController mobileNumberController =
         TextEditingController();
+    final FirebaseAuth _auth = FirebaseAuth.instance;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -48,15 +49,17 @@ class LoginScreen extends StatelessWidget {
                   Row(
                     children: [
                       SizedBox(
-                        height: 49,
+                        height: 59,
                         width: width * 0.28,
                         child: CountryCodeDropdown(countryCodes: countryCodes),
                       ),
                       SizedBox(width: width * 0.02),
                       Expanded(
                         child: CustomTextField(
+                          height: 60,
                           label: "Mobile number",
-                          keyboardType: TextInputType.phone,
+                          keyboardType:
+                              TextInputType.phone, // Use TextInputType.phone
                           controller: mobileNumberController,
                         ),
                       ),
@@ -67,22 +70,57 @@ class LoginScreen extends StatelessWidget {
                     builder: (context, provider, child) {
                       return CustomButton(
                         title: "Send OTP",
-                        onTap: () {
-                          // You can access selected country code via provider
+                        onTap: () async {
                           final selectedCountryCode =
                               provider.selectedCountryCode;
-                          final mobileNumber = mobileNumberController.text;
+                          final mobileNumber =
+                              mobileNumberController.text.trim();
+                          final phoneNumber =
+                              "$selectedCountryCode$mobileNumber";
 
-                          // You can log or use the values if needed
-                          print('Country Code: $selectedCountryCode');
-                          print('Mobile Number: $mobileNumber');
-
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => OtpVerificationScreen(),
-                            ),
-                          );
+                          if (mobileNumber.isNotEmpty) {
+                            await _auth.verifyPhoneNumber(
+                              phoneNumber: phoneNumber,
+                              verificationCompleted: (
+                                PhoneAuthCredential credential,
+                              ) async {
+                                await _auth.signInWithCredential(credential);
+                              },
+                              verificationFailed: (FirebaseAuthException e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      "Verification failed: ${e.message}",
+                                    ),
+                                  ),
+                                );
+                              },
+                              codeSent: (
+                                String verificationId,
+                                int? resendToken,
+                              ) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => OtpVerificationScreen(
+                                          verificationId: verificationId,
+                                        ),
+                                  ),
+                                );
+                              },
+                              codeAutoRetrievalTimeout:
+                                  (String verificationId) {},
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Please enter a valid mobile number",
+                                ),
+                              ),
+                            );
+                          }
                         },
                       );
                     },

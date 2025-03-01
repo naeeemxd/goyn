@@ -111,11 +111,11 @@ class UnionRegistration extends StatelessWidget {
               controller: registrationController,
             ),
             const Spacer(),
-            CustomButton(
-              title: "add",
-              color: const Color(0xFFF0AC00),
-              onTap: () => deleteAllUnions(),
-            ),
+            // CustomButton(
+            //   title: "add",
+            //   color: const Color(0xFFF0AC00),
+            //   onTap: () => deleteAllUnions(),
+            // ),
             CustomButton(
               title: "Register",
               color: const Color(0xFFF0AC00),
@@ -128,39 +128,39 @@ class UnionRegistration extends StatelessWidget {
   }
 }
 
-Future<void> addDummyUnions() async {
-  final CollectionReference unions = FirebaseFirestore.instance.collection(
-    "unions",
-  );
+// Future<void> addDummyUnions() async {
+//   final CollectionReference unions = FirebaseFirestore.instance.collection(
+//     "unions",
+//   );
 
-  for (int i = 1; i <= 100; i++) {
-    String docId =
-        DateTime.now().millisecondsSinceEpoch.toString(); // Unique ID
+//   for (int i = 1; i <= 100; i++) {
+//     String docId =
+//         DateTime.now().millisecondsSinceEpoch.toString(); // Unique ID
 
-    await unions.doc(docId).set({
-      "union_name": "Union $i",
-      "registration_number": "REG-${1000 + i}",
-      "created_at": FieldValue.serverTimestamp(),
-    });
+//     await unions.doc(docId).set({
+//       "union_name": "Union $i",
+//       "registration_number": "REG-${1000 + i}",
+//       "created_at": FieldValue.serverTimestamp(),
+//     });
 
-    await Future.delayed(
-      const Duration(milliseconds: 50),
-    ); // Small delay to avoid duplicates
-  }
+//     await Future.delayed(
+//       const Duration(milliseconds: 50),
+//     ); // Small delay to avoid duplicates
+//   }
 
-  print("✅ 100 Unions Added!");
-}
+//   print("✅ 100 Unions Added!");
+// }
 
-Future<void> deleteAllUnions() async {
-  final CollectionReference unions = FirebaseFirestore.instance.collection(
-    "unions",
-  );
+// Future<void> deleteAllUnions() async {
+//   final CollectionReference unions = FirebaseFirestore.instance.collection(
+//     "unions",
+//   );
 
-  QuerySnapshot querySnapshot = await unions.get();
+//   QuerySnapshot querySnapshot = await unions.get();
 
-  for (var doc in querySnapshot.docs) {
-    await doc.reference.delete();
-  }
+//   for (var doc in querySnapshot.docs) {
+//     await doc.reference.delete();
+//   }
 
-  print("🗑️ All unions deleted!");
-}
+//   print("🗑️ All unions deleted!");
+// }

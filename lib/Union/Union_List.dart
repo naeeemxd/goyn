@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:goyn/Driver/Driver_List.dart';
-import 'package:goyn/Union/Union_Registration.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Add this import
 import 'package:goyn/provider/Union_Provider.dart';
 import 'package:provider/provider.dart';
+import 'package:goyn/Driver/Driver_List.dart';
+import 'package:goyn/Union/Union_Registration.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class GoynHomePageContent extends StatelessWidget {
   const GoynHomePageContent({super.key});
@@ -22,182 +22,216 @@ class GoynHomePageContent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-              _buildSearchBar(context),
+              _buildSearchBar(context), // Uses optimized function
               const SizedBox(height: 16),
               _buildStatsRow(),
               const SizedBox(height: 16),
-              _buildUnionList(),
+              _buildUnionList(), // Uses optimized function
             ],
           ),
         ),
       ),
     );
   }
+}
 
-  // Floating action button
-  Widget _buildFloatingButton(BuildContext context) {
-    return FloatingActionButton.extended(
-      onPressed:
-          () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const UnionRegistration()),
-          ),
-      backgroundColor: const Color(0xFFF0AC00),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      label: const Row(
-        children: [
-          Text("Add Union ", style: _buttonTextStyle),
-          SizedBox(width: 5),
-          Icon(Icons.add, color: Colors.white, size: 18),
-        ],
-      ),
-    );
-  }
-
-  // AppBar
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      automaticallyImplyLeading: false,
-      title: Image.asset("assets/images/logo.png", width: 120, height: 40),
-      backgroundColor: Colors.transparent,
-      surfaceTintColor: Colors.transparent,
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 15.0),
-          child: GestureDetector(
-            onTap:
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => DriverList()),
-                ),
-            child: const _ProfileIcon(),
-          ),
+// Floating action button
+Widget _buildFloatingButton(BuildContext context) {
+  return FloatingActionButton.extended(
+    onPressed:
+        () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const UnionRegistration()),
         ),
+    backgroundColor: const Color(0xFFF0AC00),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+    label: const Row(
+      children: [
+        Text("Add Union ", style: _buttonTextStyle),
+        SizedBox(width: 5),
+        Icon(Icons.add, color: Colors.white, size: 18),
       ],
-    );
-  }
+    ),
+  );
+}
 
-  // Search Bar
-  Widget _buildSearchBar(BuildContext context) {
-    return Consumer<UnionProvider>(
-      builder: (context, provider, child) {
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 5),
-          child: TextField(
-            onChanged: provider.search,
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-              filled: true,
-              fillColor: const Color(0xffF5F5F5),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
+// AppBar
+PreferredSizeWidget _buildAppBar(BuildContext context) {
+  return AppBar(
+    automaticallyImplyLeading: false,
+    title: Image.asset("assets/images/logo.png", width: 120, height: 40),
+    backgroundColor: Colors.transparent,
+    surfaceTintColor: Colors.transparent,
+    actions: [
+      Padding(
+        padding: const EdgeInsets.only(right: 15.0),
+        child: GestureDetector(
+          onTap:
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DriverList()),
               ),
-              hintText: "Search Union",
-              hintStyle: GoogleFonts.openSans(
-                fontWeight: FontWeight.w400,
-                fontSize: 14,
-              ),
-              suffixIcon: Padding(
-                padding: const EdgeInsets.all(10),
-                child: SvgPicture.asset("assets/icons/search.svg"),
-              ),
-            ),
-          ),
-        );
+          child: const _ProfileIcon(),
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _buildSearchBar(BuildContext context) {
+  final searchProvider = Provider.of<SearchProvider>(context, listen: false);
+  final TextEditingController controller = TextEditingController(
+    text: searchProvider.searchQuery,
+  );
+
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 5),
+    child: TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+        filled: true,
+        fillColor: const Color(0xffF5F5F5),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none,
+        ),
+        hintText: "Search Union",
+        hintStyle: GoogleFonts.openSans(
+          fontWeight: FontWeight.w400,
+          fontSize: 14,
+        ),
+        suffixIcon: Padding(
+          padding: const EdgeInsets.all(10),
+          child:
+              searchProvider.searchQuery.isNotEmpty
+                  ? GestureDetector(
+                    onTap: () {
+                      controller.clear();
+                      searchProvider.clearSearch();
+                    },
+                    child: const Icon(Icons.close, size: 18),
+                  )
+                  : SvgPicture.asset("assets/icons/search.svg"),
+        ),
+      ),
+      onChanged: (value) {
+        searchProvider.setSearchQuery(value);
       },
-    );
-  }
+    ),
+  );
+}
 
-  // Stats row
-  // Stats row - Fetch number of unions dynamically
-  Widget _buildStatsRow() {
-    return StreamBuilder<QuerySnapshot>(
+// Stats row - Fetch number of unions dynamically
+Widget _buildStatsRow() {
+  return StreamBuilder<QuerySnapshot>(
+    stream: FirebaseFirestore.instance.collection('unions').snapshots(),
+    builder: (context, snapshot) {
+      int unionCount = snapshot.hasData ? snapshot.data!.docs.length : 0;
+
+      return Padding(
+        padding: const EdgeInsets.only(left: 4.0),
+        child: Row(
+          children: [
+            const Text("Number of Unions ", style: _statTextStyle),
+            _buildStatNumber(unionCount),
+            const SizedBox(width: 5),
+            Image.asset("assets/icons/divider.png"),
+            const SizedBox(width: 6),
+            const Text("Number of Drivers ", style: _statTextStyle),
+            _buildStatNumber(
+              0,
+            ), // Replace with actual driver count if available
+          ],
+        ),
+      );
+    },
+  );
+}
+
+Widget _buildStatNumber(int number) {
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 4),
+    child: Text(
+      "$number",
+      style: const TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 15,
+        color: Colors.purple,
+      ),
+    ),
+  );
+}
+
+// Union list with search functionality using provider
+Widget _buildUnionList() {
+  return Expanded(
+    child: StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('unions').snapshots(),
       builder: (context, snapshot) {
-        int unionCount = snapshot.hasData ? snapshot.data!.docs.length : 0;
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-        return Padding(
-          padding: const EdgeInsets.only(left: 4.0),
-          child: Row(
-            children: [
-              const Text("Number of Unions ", style: _statTextStyle),
-              _buildStatNumber(unionCount),
-              const SizedBox(width: 5),
-              Image.asset("assets/icons/divider.png"),
-              const SizedBox(width: 6),
-              const Text("Number of Drivers ", style: _statTextStyle),
-              _buildStatNumber(
-                0,
-              ), // Replace 0 with actual driver count if available
-            ],
-          ),
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const Center(
+            child: Text(
+              'No unions found',
+              style: TextStyle(color: Colors.grey, fontSize: 16),
+            ),
+          );
+        }
+
+        var unions = snapshot.data!.docs;
+
+        return Consumer<SearchProvider>(
+          builder: (context, searchProvider, child) {
+            var filteredUnions =
+                searchProvider.searchQuery.isEmpty
+                    ? unions
+                    : unions.where((union) {
+                      final unionName =
+                          union['union_name'].toString().toLowerCase();
+                      return unionName.contains(
+                        searchProvider.searchQuery.toLowerCase(),
+                      );
+                    }).toList();
+
+            if (filteredUnions.isEmpty) {
+              return const Center(
+                child: Text(
+                  'No matching unions found',
+                  style: TextStyle(color: Colors.grey, fontSize: 16),
+                ),
+              );
+            }
+
+            return ListView.builder(
+              itemCount: filteredUnions.length,
+              itemBuilder: (context, index) {
+                final union = filteredUnions[index];
+                final unionName = union['union_name'];
+
+                return UnionListItem(
+                  name: unionName,
+                  drivers: "0",
+                  onTap:
+                      () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => DriverList()),
+                      ),
+                );
+              },
+            );
+          },
         );
       },
-    );
-  }
-
-  Widget _buildStatNumber(int number) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Text(
-        "$number",
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 15,
-          color: Colors.purple,
-        ),
-      ),
-    );
-  }
-
-  // Union list
-  Widget _buildUnionList() {
-    return Expanded(
-      child: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('unions').snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(
-              child: Text(
-                'No unions found',
-                style: TextStyle(color: Colors.grey, fontSize: 16),
-              ),
-            );
-          }
-
-          final unions = snapshot.data!.docs;
-
-          return ListView.builder(
-            itemCount: unions.length,
-            itemBuilder: (context, index) {
-              final union = unions[index];
-              final unionName =
-                  union['union_name']; // Fetch the union_name field
-
-              return UnionListItem(
-                name: unionName,
-                drivers: "0", // Placeholder for drivers count
-                onTap:
-                    () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => DriverList()),
-                    ),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
+    ),
+  );
 }
 
 // Reusable Profile Icon Widget

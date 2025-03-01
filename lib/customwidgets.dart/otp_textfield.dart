@@ -5,11 +5,17 @@ import 'package:pinput/pinput.dart';
 class OTPTextField extends StatefulWidget {
   final double width;
   final int length;
+  final Function(String)? onCompleted; // Callback for when OTP is completed
+  final Function(String)? onChanged; // Callback for when OTP is changed
+  final TextEditingController? controller; // Optional controller
 
   const OTPTextField({
     super.key,
     required this.length,
     required this.width,
+    this.onCompleted,
+    this.onChanged,
+    this.controller,
   });
 
   @override
@@ -17,8 +23,15 @@ class OTPTextField extends StatefulWidget {
 }
 
 class _OTPTextFieldState extends State<OTPTextField> {
-  final TextEditingController _otpController = TextEditingController();
+  late TextEditingController _otpController;
   final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    // Use the provided controller or create a new one
+    _otpController = widget.controller ?? TextEditingController();
+  }
 
   @override
   void dispose() {
@@ -61,10 +74,14 @@ class _OTPTextFieldState extends State<OTPTextField> {
         ),
       ),
       onChanged: (value) {
-        print("OTP Entered: $value");
+        if (widget.onChanged != null) {
+          widget.onChanged!(value); // Notify parent widget of OTP change
+        }
       },
       onCompleted: (pin) {
-        print("OTP Completed: $pin");
+        if (widget.onCompleted != null) {
+          widget.onCompleted!(pin); // Notify parent widget of OTP completion
+        }
       },
     );
   }

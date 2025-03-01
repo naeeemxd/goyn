@@ -27,8 +27,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => DriverlistProvider()),
         ChangeNotifierProvider(create: (_) => UnionProvider()),
         ChangeNotifierProvider(create: (_) => RegistrationProvider()),
-                ChangeNotifierProvider(create: (_) => DropdownProvider()),
-
+        ChangeNotifierProvider(create: (_) => DropdownProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -38,6 +37,15 @@ class MyApp extends StatelessWidget {
           fontFamily: GoogleFonts.openSans().fontFamily,
         ),
         home: const SplashScreen(),
+        builder: (context, child) {
+          // Prevent text from scaling with system font settings
+          return MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: TextScaler.linear(1.0)),
+            child: child!,
+          );
+        },
       ),
     );
   }

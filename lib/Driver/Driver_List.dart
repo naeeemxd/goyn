@@ -162,7 +162,7 @@ class DriverCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 80,
+      height: 82,
       margin: EdgeInsets.symmetric(vertical: 5),
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -196,7 +196,7 @@ class DriverCard extends StatelessWidget {
                   Text(
                     driver.name,
                     style: GoogleFonts.openSans(
-                      fontSize: 15,
+                      fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
                     overflow: TextOverflow.ellipsis, // Prevents text overflow

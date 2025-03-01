@@ -169,7 +169,7 @@ class DriverDetailsPage extends StatelessWidget {
               Text(
                 title,
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   color: Colors.black,
                   fontWeight: FontWeight.w500, // Make text slightly bold
                 ),

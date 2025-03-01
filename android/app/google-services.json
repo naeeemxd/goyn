@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "315708691927",
+    "project_id": "spine-9e365",
+    "storage_bucket": "spine-9e365.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:315708691927:android:3bb105d8586a33476ba792",
+        "android_client_info": {
+          "package_name": "com.example.goyn"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLTVF-Fu4U9354jw6z6Ow8OMxriIsnfM8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:315708691927:android:d61c9389d00863946ba792",
+        "android_client_info": {
+          "package_name": "com.example.test_groovy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLTVF-Fu4U9354jw6z6Ow8OMxriIsnfM8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

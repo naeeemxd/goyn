@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:goyn/customwidgets.dart/country_codes.dart';
 import 'package:goyn/provider/Driver_Registration_provider.dart';
@@ -9,7 +10,10 @@ import 'package:goyn/provider/Union_Provider.dart';
 import 'package:provider/provider.dart';
 import 'package:goyn/splash_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(); // Initialize Firebase
+
   runApp(const MyApp());
 }
 
@@ -38,11 +42,10 @@ class MyApp extends StatelessWidget {
         ),
         home: const SplashScreen(),
         builder: (context, child) {
-          // Prevent text from scaling with system font settings
           return MediaQuery(
             data: MediaQuery.of(
               context,
-            ).copyWith(textScaler: TextScaler.linear(1.0)),
+            ).copyWith(textScaler: TextScaler.noScaling),
             child: child!,
           );
         },

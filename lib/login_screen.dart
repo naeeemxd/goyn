@@ -55,8 +55,8 @@ class LoginScreen extends StatelessWidget {
                       SizedBox(width: width * 0.02),
                       Expanded(
                         child: CustomTextField(
-                          label:
-                              "Mobile number", // Fixed typo: "Mobail" to "Mobile"
+                          label: "Mobile number",
+                          keyboardType: TextInputType.phone,
                           controller: mobileNumberController,
                         ),
                       ),

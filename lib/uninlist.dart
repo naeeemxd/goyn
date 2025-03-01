@@ -3,7 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:goyn/Driver/Driver_List.dart';
 import 'package:goyn/Union/Union_Registration.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Add this import
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:goyn/provider/Union_Provider.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +26,7 @@ class GoynHomePageContent extends StatelessWidget {
               const SizedBox(height: 16),
               _buildStatsRow(),
               const SizedBox(height: 16),
-              _buildUnionList(),
+              _buildPaginatedUnionList(),
             ],
           ),
         ),
@@ -109,13 +109,19 @@ class GoynHomePageContent extends StatelessWidget {
     );
   }
 
-  // Stats row
-  // Stats row - Fetch number of unions dynamically
   Widget _buildStatsRow() {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('unions').snapshots(),
       builder: (context, snapshot) {
-        int unionCount = snapshot.hasData ? snapshot.data!.docs.length : 0;
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator(); // Show a loader while fetching
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const Text("No unions found");
+        }
+
+        int unionCount = snapshot.data!.docs.length;
 
         return Padding(
           padding: const EdgeInsets.only(left: 4.0),
@@ -129,7 +135,7 @@ class GoynHomePageContent extends StatelessWidget {
               const Text("Number of Drivers ", style: _statTextStyle),
               _buildStatNumber(
                 0,
-              ), // Replace 0 with actual driver count if available
+              ), // Replace with actual driver count if available
             ],
           ),
         );
@@ -151,37 +157,150 @@ class GoynHomePageContent extends StatelessWidget {
     );
   }
 
-  // Union list
-  Widget _buildUnionList() {
-    return Expanded(
-      child: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('unions').snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+  // Paginated Union list
+  Widget _buildPaginatedUnionList() {
+    return Expanded(child: PaginatedUnionsList());
+  }
+}
 
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
+class PaginatedUnionsList extends StatefulWidget {
+  const PaginatedUnionsList({Key? key}) : super(key: key);
 
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(
-              child: Text(
-                'No unions found',
-                style: TextStyle(color: Colors.grey, fontSize: 16),
-              ),
-            );
-          }
+  @override
+  _PaginatedUnionsListState createState() => _PaginatedUnionsListState();
+}
 
-          final unions = snapshot.data!.docs;
+class _PaginatedUnionsListState extends State<PaginatedUnionsList> {
+  final int _pageSize = 20;
+  final List<DocumentSnapshot> _unions = [];
+  bool _isLoading = false;
+  bool _hasMoreData = true;
+  DocumentSnapshot? _lastDocument;
+  final ScrollController _scrollController = ScrollController();
 
-          return ListView.builder(
-            itemCount: unions.length,
+  @override
+  void initState() {
+    super.initState();
+    _fetchInitialData();
+    _scrollController.addListener(_scrollListener);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent * 0.8) {
+      if (!_isLoading && _hasMoreData) {
+        _fetchMoreData();
+      }
+    }
+  }
+
+  Future<void> _fetchInitialData() async {
+    if (_isLoading) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance
+              .collection('unions')
+              .orderBy('union_name')
+              .limit(_pageSize)
+              .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        setState(() {
+          _unions.clear();
+          _unions.addAll(querySnapshot.docs);
+          _lastDocument = querySnapshot.docs.last;
+          _hasMoreData = querySnapshot.docs.length == _pageSize;
+        });
+      } else {
+        setState(() {
+          _hasMoreData = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching unions: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _fetchMoreData() async {
+    if (_isLoading || !_hasMoreData || _lastDocument == null) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance
+              .collection('unions')
+              .orderBy('union_name')
+              .startAfterDocument(_lastDocument!)
+              .limit(_pageSize)
+              .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        setState(() {
+          _unions.addAll(querySnapshot.docs);
+          _lastDocument = querySnapshot.docs.last;
+          _hasMoreData = querySnapshot.docs.length == _pageSize;
+        });
+      } else {
+        setState(() {
+          _hasMoreData = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching more unions: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_unions.isEmpty && _isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_unions.isEmpty && !_hasMoreData) {
+      return const Center(
+        child: Text(
+          'No unions found',
+          style: TextStyle(color: Colors.grey, fontSize: 16),
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            controller: _scrollController,
+            itemCount: _unions.length + (_hasMoreData ? 1 : 0),
             itemBuilder: (context, index) {
-              final union = unions[index];
-              final unionName =
-                  union['union_name']; // Fetch the union_name field
+              if (index == _unions.length) {
+                return _buildLoadingIndicator();
+              }
+
+              final union = _unions[index];
+              final unionName = union['union_name'];
 
               return UnionListItem(
                 name: unionName,
@@ -193,9 +312,17 @@ class GoynHomePageContent extends StatelessWidget {
                     ),
               );
             },
-          );
-        },
-      ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLoadingIndicator() {
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      alignment: Alignment.center,
+      child: const CircularProgressIndicator(),
     );
   }
 }

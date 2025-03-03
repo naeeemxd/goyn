@@ -7,19 +7,7 @@ import 'package:goyn/customwidgets.dart/Custom_Widgets.dart';
 import 'package:goyn/provider/ImageProvider.dart';
 
 class DriverEditScreen extends StatelessWidget {
-  DriverEditScreen({super.key});
-
-  // Simulated existing document data
-  final Map<String, bool> existingDocuments = {
-    "Aadhaar card": true,
-    "Pan card": true,
-    "Bank passbook/Cheque": false,
-    "Police clearance certificate/Judgement copy": false,
-    "Registration Certificate": true,
-    "Vehicle Insurance": false,
-    "Certificate of fitness": true,
-    "Vehicle permit": false,
-  };
+  const DriverEditScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -190,11 +178,7 @@ class DriverEditScreen extends StatelessWidget {
                                 ),
                               ),
                               const Spacer(),
-                              SvgPicture.asset(
-                                existingDocuments[selectedItem] == true
-                                    ? "assets/icons/greenTick.svg"
-                                    : "assets/icons/RightArrow.svg",
-                              ),
+                              SvgPicture.asset("assets/icons/RightArrow.svg"),
                             ],
                           ),
                         ),

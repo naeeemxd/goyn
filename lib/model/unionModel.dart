@@ -1,17 +1,19 @@
-// import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-// class SearchProvider extends ChangeNotifier {
-//   String _searchQuery = '';
+class Union {
+  final String id;
+  final String unionName;
 
-//   String get searchQuery => _searchQuery;
+  Union({
+    required this.id,
+    required this.unionName,
+  });
 
-//   void setSearchQuery(String query) {
-//     _searchQuery = query;
-//     notifyListeners();
-//   }
-
-//   void clearSearch() {
-//     _searchQuery = '';
-//     notifyListeners();
-//   }
-// }
+  factory Union.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return Union(
+      id: doc.id,
+      unionName: data['union_name'] ?? '',
+    );
+  }
+}

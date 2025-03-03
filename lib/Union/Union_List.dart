@@ -22,11 +22,11 @@ class GoynHomePageContent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-              _buildSearchBar(context), // Uses optimized function
+              _buildSearchBar(context),
               const SizedBox(height: 16),
               _buildStatsRow(),
               const SizedBox(height: 16),
-              _buildUnionList(), // Uses optimized function
+              _buildUnionList(),
             ],
           ),
         ),
@@ -124,17 +124,14 @@ Widget _buildSearchBar(BuildContext context) {
 
 // Stats row - Fetch number of unions dynamically
 Widget _buildStatsRow() {
-  return StreamBuilder<QuerySnapshot>(
-    stream: FirebaseFirestore.instance.collection('unions').snapshots(),
-    builder: (context, snapshot) {
-      int unionCount = snapshot.hasData ? snapshot.data!.docs.length : 0;
-
+  return Consumer<UnionProvider>(
+    builder: (context, unionProvider, child) {
       return Padding(
         padding: const EdgeInsets.only(left: 4.0),
         child: Row(
           children: [
             const Text("Number of Unions ", style: _statTextStyle),
-            _buildStatNumber(unionCount),
+            _buildStatNumber(unionProvider.unions.length),
             const SizedBox(width: 5),
             Image.asset("assets/icons/divider.png"),
             const SizedBox(width: 6),
@@ -166,18 +163,9 @@ Widget _buildStatNumber(int number) {
 // Union list with search functionality using provider
 Widget _buildUnionList() {
   return Expanded(
-    child: StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('unions').snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
-
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+    child: Consumer<UnionProvider>(
+      builder: (context, unionProvider, child) {
+        if (unionProvider.unions.isEmpty) {
           return const Center(
             child: Text(
               'No unions found',
@@ -186,20 +174,11 @@ Widget _buildUnionList() {
           );
         }
 
-        var unions = snapshot.data!.docs;
-
         return Consumer<SearchProvider>(
           builder: (context, searchProvider, child) {
-            var filteredUnions =
-                searchProvider.searchQuery.isEmpty
-                    ? unions
-                    : unions.where((union) {
-                      final unionName =
-                          union['union_name'].toString().toLowerCase();
-                      return unionName.contains(
-                        searchProvider.searchQuery.toLowerCase(),
-                      );
-                    }).toList();
+            final filteredUnions = unionProvider.searchUnions(
+              searchProvider.searchQuery,
+            );
 
             if (filteredUnions.isEmpty) {
               return const Center(
@@ -214,11 +193,9 @@ Widget _buildUnionList() {
               itemCount: filteredUnions.length,
               itemBuilder: (context, index) {
                 final union = filteredUnions[index];
-                final unionName = union['union_name'];
-
                 return UnionListItem(
-                  name: unionName,
-                  drivers: "0",
+                  name: union.unionName,
+                  drivers: '0',
                   onTap:
                       () => Navigator.push(
                         context,

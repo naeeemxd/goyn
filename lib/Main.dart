@@ -6,6 +6,7 @@ import 'package:goyn/provider/Driver_Registration_provider.dart';
 import 'package:goyn/provider/DriverlistProvider.dart';
 import 'package:goyn/provider/Dropdown_Provider.dart';
 import 'package:goyn/provider/Login_Provider.dart';
+import 'package:goyn/provider/ProfilePhoto_Provider.dart';
 import 'package:goyn/provider/Union_Provider.dart';
 import 'package:provider/provider.dart';
 import 'package:goyn/splash_screen.dart';
@@ -28,13 +29,14 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => CountryCodeProvider(countryCodes: countryCodes),
         ),
-        ChangeNotifierProvider(create: (context) => FilterProvider()),
         ChangeNotifierProvider(create: (_) => DriverlistProvider()),
-        // ChangeNotifierProvider(create: (_) => UnionProvider()), // Uncommented this line
         ChangeNotifierProvider(create: (_) => SearchProvider()),
         ChangeNotifierProvider(create: (_) => RegistrationProvider()),
         ChangeNotifierProvider(create: (_) => DropdownProvider()),
+        ChangeNotifierProvider(create: (_) => UnionProvider()),
+        ChangeNotifierProvider(create: (_) => ProfilePhotoProvider()),
       ],
+
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(

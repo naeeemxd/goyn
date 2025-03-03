@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:goyn/customwidgets.dart/CustomAppBar.dart';
 import 'package:goyn/customwidgets.dart/custom_button.dart';
 import 'package:goyn/customwidgets.dart/custom_textfield.dart';
+import 'package:goyn/login_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UnionRegistration extends StatelessWidget {
   const UnionRegistration({super.key});
@@ -111,11 +114,23 @@ class UnionRegistration extends StatelessWidget {
               controller: registrationController,
             ),
             const Spacer(),
-            // CustomButton(
-            //   title: "add",
-            //   color: const Color(0xFFF0AC00),
-            //   onTap: () => deleteAllUnions(),
-            // ),
+            CustomButton(
+              title: "Logout",
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                final SharedPreferences prefs =
+                    await SharedPreferences.getInstance();
+                await prefs.clear();
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                  (route) => false,
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Logged out successfully")),
+                );
+              },
+            ),
             CustomButton(
               title: "Register",
               color: const Color(0xFFF0AC00),

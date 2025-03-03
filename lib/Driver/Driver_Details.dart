@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:goyn/Driver/driverProfilePhoto.dart';
 import 'package:goyn/customwidgets.dart/CustomAppBar.dart';
 import 'package:goyn/customwidgets.dart/deletepopup.dart';
 
@@ -34,7 +35,17 @@ class DriverDetailsPage extends StatelessWidget {
               ),
               _buildDocumentSection('Aadhaar card'),
               _buildDocumentSection('Pan card'),
-              _buildDocumentSection('profile photo'),
+              _buildDocumentSection(
+                'profile photo',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfilePhotoScreen(),
+                    ),
+                  );
+                },
+              ),
 
               // Vehicle Details section
               const Padding(
@@ -143,43 +154,46 @@ class DriverDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDocumentSection(String title) {
+  Widget _buildDocumentSection(String title, {VoidCallback? onTap}) {
     return Padding(
       padding: const EdgeInsets.only(top: 10.0),
-      child: Container(
-        height: 50,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2), // Slightly stronger shadow
-              spreadRadius: 1, // Soft spread
-              blurRadius: 4, // More visible blur
-              offset: Offset(1, 1), // Slightly offset shadow
-            ),
-          ],
-        ),
-        alignment: Alignment.centerLeft, // Centers the text
-        child: Padding(
-          padding: const EdgeInsets.only(left: 10.0),
-          child: Row(
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500, // Make text slightly bold
-                ),
-              ),
-              Spacer(),
-              Padding(
-                padding: const EdgeInsets.only(right: 10.0),
-                child: Icon(Icons.chevron_right),
+      child: GestureDetector(
+        onTap: onTap, // onTap is now optional
+        child: Container(
+          height: 50,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2), // Slightly stronger shadow
+                spreadRadius: 1, // Soft spread
+                blurRadius: 4, // More visible blur
+                offset: const Offset(1, 1), // Slightly offset shadow
               ),
             ],
+          ),
+          alignment: Alignment.centerLeft, // Centers the text
+          child: Padding(
+            padding: const EdgeInsets.only(left: 10.0),
+            child: Row(
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500, // Slightly bold text
+                  ),
+                ),
+                const Spacer(),
+                const Padding(
+                  padding: EdgeInsets.only(right: 10.0),
+                  child: Icon(Icons.chevron_right),
+                ),
+              ],
+            ),
           ),
         ),
       ),

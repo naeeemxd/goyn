@@ -1,16 +1,72 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
+import 'dart:math';
 import 'package:goyn/customwidgets.dart/countryCodeDropDown.dart';
 import 'package:goyn/provider/Login_Provider.dart';
 import 'package:goyn/customwidgets.dart/country_codes.dart';
 import 'package:goyn/customwidgets.dart/custom_button.dart';
 import 'package:goyn/customwidgets.dart/custom_textfield.dart';
 import 'package:goyn/otp_verification_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
+
+  // Generate a random 6-digit OTP
+  String _generateOTP() {
+    Random random = Random();
+    return (100000 + random.nextInt(900000)).toString();
+  }
+
+  // Check if user exists in Firebase
+  Future<bool> _checkUserExists(String phoneNumber) async {
+    try {
+      final userDoc =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(phoneNumber)
+              .get();
+
+      return userDoc.exists;
+    } catch (e) {
+      print("Error checking user: $e");
+      return false;
+    }
+  }
+
+  // Send OTP via API
+  Future<bool> _sendOTP(String mobileNumber, String otp) async {
+    try {
+      String template =
+          "OTP+for+your+mobile+number+verification+is+$otp.Spinecodes";
+
+      final uri = Uri.parse(
+        'https://m1.sarv.com/api/v2.0/sms_campaign.php'
+        '?token=140634824266559c35cb5aa4.81948085'
+        '&user_id=76595417'
+        '&route=TR'
+        '&template_id=13908'
+        '&sender_id=SPINEO'
+        '&language=EN'
+        '&template=$template'
+        '&contact_numbers=$mobileNumber',
+      );
+
+      final response = await http.get(uri);
+
+      // Check if the API request was successful
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print("Error sending OTP: $e");
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +74,6 @@ class LoginScreen extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
     final TextEditingController mobileNumberController =
         TextEditingController();
-    final FirebaseAuth _auth = FirebaseAuth.instance;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -58,8 +113,7 @@ class LoginScreen extends StatelessWidget {
                         child: CustomTextField(
                           height: 60,
                           label: "Mobile number",
-                          keyboardType:
-                              TextInputType.phone, // Use TextInputType.phone
+                          keyboardType: TextInputType.phone,
                           controller: mobileNumberController,
                         ),
                       ),
@@ -75,48 +129,77 @@ class LoginScreen extends StatelessWidget {
                               provider.selectedCountryCode;
                           final mobileNumber =
                               mobileNumberController.text.trim();
-                          final phoneNumber =
+                          final fullPhoneNumber =
                               "$selectedCountryCode$mobileNumber";
 
-                          if (mobileNumber.isNotEmpty) {
-                            await _auth.verifyPhoneNumber(
-                              phoneNumber: phoneNumber,
-                              verificationCompleted: (
-                                PhoneAuthCredential credential,
-                              ) async {
-                                await _auth.signInWithCredential(credential);
-                              },
-                              verificationFailed: (FirebaseAuthException e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      "Verification failed: ${e.message}",
-                                    ),
-                                  ),
-                                );
-                              },
-                              codeSent: (
-                                String verificationId,
-                                int? resendToken,
-                              ) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (context) => OtpVerificationScreen(
-                                          verificationId: verificationId,
-                                        ),
-                                  ),
-                                );
-                              },
-                              codeAutoRetrievalTimeout:
-                                  (String verificationId) {},
-                            );
-                          } else {
+                          if (mobileNumber.isEmpty) {
+                            // Show error for empty mobile number
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
                                   "Please enter a valid mobile number",
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+
+                          // Show loading indicator
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (BuildContext context) {
+                              return Center(child: CircularProgressIndicator());
+                            },
+                          );
+
+                          // Check if user exists in Firebase
+                          bool userExists = await _checkUserExists(
+                            fullPhoneNumber,
+                          );
+
+                          if (!userExists) {
+                            // Close loading dialog
+                            Navigator.pop(context);
+
+                            // Show error message for unregistered user
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "This number is not registered. Please contact support.",
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+
+                          // Generate OTP
+                          String otp = _generateOTP();
+
+                          // Send OTP via API
+                          bool otpSent = await _sendOTP(fullPhoneNumber, otp);
+
+                          // Close loading dialog
+                          Navigator.pop(context);
+
+                          if (otpSent) {
+                            // Navigate to OTP verification screen
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => OtpVerificationScreen(
+                                      otp: otp,
+                                      phoneNumber: fullPhoneNumber,
+                                    ),
+                              ),
+                            );
+                          } else {
+                            // Show error message
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Failed to send OTP. Please try again.",
                                 ),
                               ),
                             );

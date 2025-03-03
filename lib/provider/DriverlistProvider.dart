@@ -113,5 +113,3 @@ class FilterProvider with ChangeNotifier {
     notifyListeners(); // Notify listeners to rebuild the UI
   }
 }
-
-

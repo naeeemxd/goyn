@@ -15,8 +15,8 @@ class ConfirmationDialog extends StatelessWidget {
             Text(
               'Delete Driver?',
               style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
                 color: Colors.red,
               ),
             ),
@@ -45,10 +45,10 @@ class ConfirmationDialog extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     child: Text(
-                      'Edit',
+                      'Delete',
                       style: const TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w800,
                         color: Color(0xFFEA0004),
                       ),
                     ),
@@ -58,14 +58,7 @@ class ConfirmationDialog extends StatelessWidget {
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [
-                          Color(0xFFA10066),
-                          Color(0xFF870055),
-                        ], // Gradient colors
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      color: Color(0xFFF0AC00),
                       borderRadius: BorderRadius.circular(
                         24,
                       ), // Match button shape
@@ -92,7 +85,7 @@ class ConfirmationDialog extends StatelessWidget {
                         'Edit',
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                     ),
@@ -106,6 +99,7 @@ class ConfirmationDialog extends StatelessWidget {
     );
   }
 }
+
 void showDeleteConfirmationDialog(BuildContext context) {
   showDialog(
     context: context,

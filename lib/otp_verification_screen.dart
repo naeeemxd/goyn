@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:goyn/Union/Union_List.dart';
-import 'package:goyn/customwidgets.dart/CustomAppBar.dart';
-import 'package:goyn/customwidgets.dart/custom_button.dart';
+import 'package:goyn/customwidgets.dart/Custom_Widgets.dart';
 import 'package:goyn/customwidgets.dart/otp_textfield.dart';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class OtpVerificationScreen extends StatefulWidget {

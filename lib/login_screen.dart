@@ -7,7 +7,7 @@ import 'package:goyn/customwidgets.dart/countryCodeDropDown.dart';
 import 'package:goyn/provider/Login_Provider.dart';
 import 'package:goyn/customwidgets.dart/country_codes.dart';
 import 'package:goyn/customwidgets.dart/custom_button.dart';
-import 'package:goyn/customwidgets.dart/custom_textfield.dart';
+import 'package:goyn/customwidgets.dart/Custom_Widgets.dart';
 import 'package:goyn/otp_verification_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 

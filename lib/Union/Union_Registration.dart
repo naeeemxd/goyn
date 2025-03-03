@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:goyn/customwidgets.dart/CustomAppBar.dart';
-import 'package:goyn/customwidgets.dart/custom_button.dart';
-import 'package:goyn/customwidgets.dart/custom_textfield.dart';
+import 'package:goyn/customwidgets.dart/Custom_Widgets.dart';
 import 'package:goyn/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

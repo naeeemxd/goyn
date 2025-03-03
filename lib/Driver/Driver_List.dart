@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:goyn/Driver/Driver_Details.dart';
 import 'package:goyn/Driver/Driver_Registration.dart';
-import 'package:goyn/customwidgets.dart/CustomAppBar.dart';
+import 'package:goyn/customwidgets.dart/Custom_Widgets.dart';
 import 'package:goyn/provider/DriverlistProvider.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,10 +14,7 @@ class DriverList extends StatelessWidget {
       appBar: CustomAppBar(title: "Union"),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => DriverRegistrationScreen()),
-          );
+          navigateTo(context, DriverRegistrationScreen());
         },
         backgroundColor: const Color(0xFFF0AC00),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -140,12 +137,7 @@ class _DriversList extends StatelessWidget {
       itemBuilder: (context, index) {
         final driver = filteredDrivers[index];
         return GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => DriverDetailsPage()),
-            );
-          },
+          onTap: () => navigateTo(context, DriverDetailsPage()),
           child: DriverCard(driver: driver),
         );
       },

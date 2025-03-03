@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:goyn/Driver/Driver_Edit.dart';
 import 'package:goyn/Driver/driverProfilePhoto.dart';
-import 'package:goyn/customwidgets.dart/CustomAppBar.dart';
-import 'package:goyn/customwidgets.dart/deletepopup.dart';
+import 'package:goyn/Driver/widgetProfile.dart';
+import 'package:goyn/customwidgets.dart/Custom_Widgets.dart';
+import 'package:goyn/provider/ImageProvider.dart';
 
 class DriverDetailsPage extends StatelessWidget {
   const DriverDetailsPage({Key? key}) : super(key: key);
@@ -29,22 +31,48 @@ class DriverDetailsPage extends StatelessWidget {
               const SizedBox(height: 16),
 
               // Document sections with chevron
-              _buildDocumentSection('Bank passbook/Cheque'),
+              _buildDocumentSection(
+                'Bank passbook/Cheque',
+                onTap:
+                    () => navigateTo(
+                      context,
+                      DriverProfileWidget<BankProvider>(
+                        documentName: 'Bank Passbook/Check',
+                      ),
+                    ),
+              ),
               _buildDocumentSection(
                 'Police clearance certificate/Judgement copy',
-              ),
-              _buildDocumentSection('Aadhaar card'),
-              _buildDocumentSection('Pan card'),
-              _buildDocumentSection(
-                'profile photo',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProfilePhotoScreen(),
+                onTap:
+                    () => navigateTo(
+                      context,
+                      DriverProfileWidget<PoliceProvider>(
+                        documentName: 'Police Clearance/Judgment',
+                        fieldName: 'Enter your Police Clearance',
+                      ),
                     ),
-                  );
-                },
+              ),
+              _buildDocumentSection(
+                'Aadhaar card',
+                onTap:
+                    () => navigateTo(
+                      context,
+                      DriverProfileWidget<AdharProvider>(
+                        documentName: 'Adhaar',
+                      ),
+                    ),
+              ),
+              _buildDocumentSection(
+                'Pan card',
+                onTap:
+                    () => navigateTo(
+                      context,
+                      DriverProfileWidget<PanProvider>(documentName: 'Pan'),
+                    ),
+              ),
+              _buildDocumentSection(
+                'Profile photo',
+                onTap: () => navigateTo(context, ProfilePhotoScreen()),
               ),
 
               // Vehicle Details section
@@ -61,10 +89,46 @@ class DriverDetailsPage extends StatelessWidget {
               ),
 
               // Vehicle document sections
-              _buildDocumentSection('Registration certificate'),
-              _buildDocumentSection('Vehicle Insurance'),
-              _buildDocumentSection('Cirtificate of fitness'),
-              _buildDocumentSection('Vehicle permit'),
+              _buildDocumentSection(
+                'Registration Certificate',
+                onTap:
+                    () => navigateTo(
+                      context,
+                      DriverProfileWidget<RegistrationnProvider>(
+                        documentName: 'Registration Certificate',
+                      ),
+                    ),
+              ),
+              _buildDocumentSection(
+                'Vehicle Insurance',
+                onTap:
+                    () => navigateTo(
+                      context,
+                      DriverProfileWidget<InsuranceProvider>(
+                        documentName: 'Vehicle Insurance',
+                      ),
+                    ),
+              ),
+              _buildDocumentSection(
+                'Cirtificate of Fitness',
+                onTap:
+                    () => navigateTo(
+                      context,
+                      DriverProfileWidget<FitnessProvider>(
+                        documentName: 'Cirtificate of Fitness',
+                      ),
+                    ),
+              ),
+              _buildDocumentSection(
+                'Vehicle Permit',
+                onTap:
+                    () => navigateTo(
+                      context,
+                      DriverProfileWidget<VehicleProvider>(
+                        documentName: 'Vehicle Permit',
+                      ),
+                    ),
+              ),
 
               // Bottom action buttons
               Padding(
@@ -101,25 +165,9 @@ class DriverDetailsPage extends StatelessWidget {
                     Expanded(
                       child: SizedBox(
                         height: 50,
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFF2B705),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                          ),
-                          child: const Text(
-                            'Edit',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                            ),
-                          ),
+                        child: CustomButton(
+                          title: 'Edit',
+                          onTap: () => navigateTo(context, DriverEditScreen()),
                         ),
                       ),
                     ),

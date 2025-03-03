@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:goyn/customwidgets.dart/CustomAppBar.dart';
-import 'package:goyn/provider/ProfilePhoto_Provider.dart';
+import 'package:goyn/customwidgets.dart/Custom_Widgets.dart';
+import 'package:goyn/provider/ImageProvider.dart';
 import 'package:provider/provider.dart';
-import 'package:goyn/customwidgets.dart/custom_button.dart';
 
 class ProfilePhotoScreen extends StatelessWidget {
   const ProfilePhotoScreen({Key? key}) : super(key: key);

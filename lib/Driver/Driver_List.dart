@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:goyn/Driver/Driver_Details.dart';
 import 'package:goyn/Driver/Driver_Registration.dart';
+import 'package:goyn/Driver/ImageUtils.dart';
 import 'package:goyn/customwidgets.dart/Custom_Widgets.dart';
 import 'package:goyn/provider/DriverlistProvider.dart';
 import 'package:provider/provider.dart';

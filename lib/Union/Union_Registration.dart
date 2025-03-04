@@ -37,9 +37,7 @@ class UnionRegistration extends StatelessWidget {
       return;
     }
 
-    String docId =
-        DateTime.now().millisecondsSinceEpoch
-            .toString(); // Generate timestamp ID
+    String docId = unionName; // Generate timestamp ID
 
     try {
       // Check if union with the same name already exists
@@ -140,29 +138,6 @@ class UnionRegistration extends StatelessWidget {
     );
   }
 }
-
-// Future<void> addDummyUnions() async {
-//   final CollectionReference unions = FirebaseFirestore.instance.collection(
-//     "unions",
-//   );
-
-//   for (int i = 1; i <= 100; i++) {
-//     String docId =
-//         DateTime.now().millisecondsSinceEpoch.toString(); // Unique ID
-
-//     await unions.doc(docId).set({
-//       "union_name": "Union $i",
-//       "registration_number": "REG-${1000 + i}",
-//       "created_at": FieldValue.serverTimestamp(),
-//     });
-
-//     await Future.delayed(
-//       const Duration(milliseconds: 50),
-//     ); // Small delay to avoid duplicates
-//   }
-
-//   print("✅ 100 Unions Added!");
-// }
 
 // Future<void> deleteAllUnions() async {
 //   final CollectionReference unions = FirebaseFirestore.instance.collection(

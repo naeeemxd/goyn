@@ -14,7 +14,7 @@ class DriverList extends StatelessWidget {
       appBar: CustomAppBar(title: "Union"),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          navigateTo(context, DriverRegistrationScreen());
+          navigateTo(context, AddDrivers());
         },
         backgroundColor: const Color(0xFFF0AC00),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),

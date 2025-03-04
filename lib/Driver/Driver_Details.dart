@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goyn/Driver/Driver_Edit.dart';
+import 'package:goyn/Driver/detailsShow.dart';
 import 'package:goyn/Driver/driverProfilePhoto.dart';
 import 'package:goyn/Driver/widgetProfile.dart';
 import 'package:goyn/customwidgets.dart/Custom_Widgets.dart';
@@ -32,13 +33,11 @@ class DriverDetailsPage extends StatelessWidget {
 
               // Document sections with chevron
               _buildDocumentSection(
-                'Bank passbook/Cheque',
+                'Bank Passbook/Check',
                 onTap:
                     () => navigateTo(
                       context,
-                      DriverProfileWidget<BankProvider>(
-                        documentName: 'Bank Passbook/Check',
-                      ),
+                      DocumentPage(title: "Bank Passbook/Check"),
                     ),
               ),
               _buildDocumentSection(
@@ -46,9 +45,9 @@ class DriverDetailsPage extends StatelessWidget {
                 onTap:
                     () => navigateTo(
                       context,
-                      DriverProfileWidget<PoliceProvider>(
-                        documentName: 'Police Clearance/Judgment',
-                        fieldName: 'Enter your Police Clearance',
+                      DocumentPage(
+                        title: "Police clearance certificate/Judgement copy",
+                        showTextField: false,
                       ),
                     ),
               ),
@@ -57,8 +56,9 @@ class DriverDetailsPage extends StatelessWidget {
                 onTap:
                     () => navigateTo(
                       context,
-                      DriverProfileWidget<AdharProvider>(
-                        documentName: 'Adhaar',
+                      DocumentPage(
+                        title: "Adhaar Card",
+                        imagePlaceholderText: "Adhaar Number",
                       ),
                     ),
               ),
@@ -67,7 +67,10 @@ class DriverDetailsPage extends StatelessWidget {
                 onTap:
                     () => navigateTo(
                       context,
-                      DriverProfileWidget<PanProvider>(documentName: 'Pan'),
+                      DocumentPage(
+                        title: "Pan Card",
+                        imagePlaceholderText: "Pan Card",
+                      ),
                     ),
               ),
               _buildDocumentSection(
@@ -94,8 +97,9 @@ class DriverDetailsPage extends StatelessWidget {
                 onTap:
                     () => navigateTo(
                       context,
-                      DriverProfileWidget<RegistrationnProvider>(
-                        documentName: 'Registration Certificate',
+                      DocumentPage(
+                        title: "Registration Certificate",
+                        showTextField: false,
                       ),
                     ),
               ),
@@ -104,8 +108,9 @@ class DriverDetailsPage extends StatelessWidget {
                 onTap:
                     () => navigateTo(
                       context,
-                      DriverProfileWidget<InsuranceProvider>(
-                        documentName: 'Vehicle Insurance',
+                      DocumentPage(
+                        title: "Vehicle Insurance",
+                        showTextField: false,
                       ),
                     ),
               ),
@@ -114,8 +119,9 @@ class DriverDetailsPage extends StatelessWidget {
                 onTap:
                     () => navigateTo(
                       context,
-                      DriverProfileWidget<FitnessProvider>(
-                        documentName: 'Cirtificate of Fitness',
+                      DocumentPage(
+                        title: "Cirtificate of Fitness",
+                        showTextField: false,
                       ),
                     ),
               ),
@@ -124,8 +130,9 @@ class DriverDetailsPage extends StatelessWidget {
                 onTap:
                     () => navigateTo(
                       context,
-                      DriverProfileWidget<VehicleProvider>(
-                        documentName: 'Vehicle Permit',
+                      DocumentPage(
+                        title: "Vehicle Permit",
+                        showTextField: false,
                       ),
                     ),
               ),
@@ -167,7 +174,7 @@ class DriverDetailsPage extends StatelessWidget {
                         height: 50,
                         child: CustomButton(
                           title: 'Edit',
-                          onTap: () => navigateTo(context, DriverEditScreen()),
+                          onTap: () => navigateTo(context, DriverEdit()),
                         ),
                       ),
                     ),

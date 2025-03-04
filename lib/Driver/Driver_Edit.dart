@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:goyn/customwidgets.dart/countryCodeDropDown.dart';
 import 'package:goyn/Driver/widgetProfile.dart';
 import 'package:goyn/customwidgets.dart/color.dart';
 import 'package:goyn/customwidgets.dart/Custom_Widgets.dart';
 import 'package:goyn/provider/ImageProvider.dart';
 
-class DriverEditScreen extends StatelessWidget {
-  const DriverEditScreen({super.key});
+class DriverEdit extends StatelessWidget {
+  DriverEdit({super.key});
+
+  final ValueNotifier<String?> selectedUnion = ValueNotifier<String?>(
+    null,
+  ); // Holds selected union name
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +21,7 @@ class DriverEditScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomAppBar(title: "Edit Details"),
+      appBar: CustomAppBar(title: "Edit Driver"),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: width * 0.025),
         child: ListView(
@@ -34,6 +39,7 @@ class DriverEditScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 5),
+
             ListView.builder(
               itemCount: 3,
               physics: const NeverScrollableScrollPhysics(),
@@ -47,29 +53,14 @@ class DriverEditScreen extends StatelessWidget {
                     ),
                   ),
             ),
-            Container(
-              height: 50,
-              width: width,
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: textFieldclr,
-              ),
-              child: Row(
-                children: [
-                  const Text("Select Union"),
-                  const Spacer(),
-                  DropdownButton<String>(
-                    items: const [
-                      DropdownMenuItem(child: Text('Yes'), value: 'Yes'),
-                      DropdownMenuItem(child: Text('No'), value: 'No'),
-                    ],
-                    onChanged: (String? newValue) {},
-                  ),
-                ],
-              ),
+            const SizedBox(height: 10),
+            UnionSelectionWidget(
+              width: MediaQuery.of(context).size.width,
+              textFieldColor: textFieldclr,
+              selectedUnion: selectedUnion,
             ),
             const SizedBox(height: 20),
+
             ListView.builder(
               itemCount: 9,
               physics: const NeverScrollableScrollPhysics(),
@@ -110,8 +101,7 @@ class DriverEditScreen extends StatelessWidget {
                   ),
                   "Police clearance certificate/Judgement copy":
                       DriverProfileWidget<PoliceProvider>(
-                        documentName:
-                            "Police clearance certificate/Judgement copy",
+                        documentName: "Police clearance/Judgement Certificate",
                       ),
                   "Aadhaar card": DriverProfileWidget<AdharProvider>(
                     documentName: "Aadhaar Card",

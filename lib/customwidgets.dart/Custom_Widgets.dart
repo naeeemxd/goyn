@@ -154,9 +154,7 @@ class ConfirmationDialog extends StatelessWidget {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => DriverEditScreen(),
-                          ),
+                          MaterialPageRoute(builder: (context) => DriverEdit            ()),
                         );
                       },
                     ),
@@ -269,10 +267,5 @@ class CustomButton extends StatelessWidget {
 }
 
 void navigateTo(BuildContext context, Widget screen) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => screen,
-    ),
-  );
+  Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
 }

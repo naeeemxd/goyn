@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:goyn/Driver/Driver_Edit.dart';
-import 'package:goyn/customwidgets.dart/custom_button.dart';
 
 class CustomTextField extends StatelessWidget {
   final String label;
@@ -154,7 +153,7 @@ class ConfirmationDialog extends StatelessWidget {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => DriverEdit            ()),
+                          MaterialPageRoute(builder: (context) => DriverEdit()),
                         );
                       },
                     ),

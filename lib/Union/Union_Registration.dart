@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:goyn/customwidgets.dart/Custom_Widgets.dart';
 import 'package:goyn/login_screen.dart';
+import 'package:goyn/provider/Union_Provider.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UnionRegistration extends StatelessWidget {
@@ -75,6 +77,7 @@ class UnionRegistration extends StatelessWidget {
       unionController.clear();
       registrationController.clear();
       Navigator.pop(context);
+      Provider.of<UnionProvider>(context, listen: false).fetchUnions();
     } on FirebaseException catch (e) {
       // Handle Firestore-specific errors
       ScaffoldMessenger.of(context).showSnackBar(

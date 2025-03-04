@@ -80,10 +80,7 @@ class OtpVerificationView extends StatelessWidget {
                       length: 6,
                       width: width,
                       controller: provider.otpController,
-                      // Ensure this allows auto-submission
                       onCompleted: (pin) {
-                        // This should trigger the listener in the provider
-                        // but we'll call verify directly as a backup
                         provider.verifyOtp(context);
                       },
                     ),

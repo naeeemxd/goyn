@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
@@ -9,19 +8,22 @@ class DBDriverRegistration {
   Future<void> driverRequirementsSaveToFirestoreDataBase({
     required String driverName,
     required String driverMobileNumber,
+    required String unionDocId,
     required String driverAddress,
-    required String driverEmail,
-    // required String areYouMemberOfAnyUnion,
     required String memberOfUnionName,
+
+    // IDs
     required String bankPassBookOrCheckNumber,
     required String policeClearanceCertificateOrJudgementCopy,
-    required String aadhaarCard,
-    required String panCard,
-    required String registrationCertificate,
-    required String vehicleInsurance,
-    required String certificateOfFitness,
-    required String vehiclePermit,
-    required File? bankPassBookOrCheckImages,
+    required String aadhaarCardNumber,
+    required String panCardNumber,
+    required String registrationCertificateNumber,
+    required String vehicleInsuranceNumber,
+    required String certificateOfFitnessNumber,
+    required String vehiclePermitNumber,
+
+    // Images
+    required File? bankPassBookOrCheckImage,
     required File? policeClearanceCertificateOrJudgementCopyImage,
     required File? aadhaarCardFrontImage,
     required File? aadhaarCardBackImage,
@@ -31,83 +33,76 @@ class DBDriverRegistration {
     required File? certificateOfFitnessImage,
     required File? vehiclePermitImage,
   }) async {
-    // List of images with their corresponding variable names
-    Map<String, File?> images = {
-      'bankPassBookImages': bankPassBookOrCheckImages,
-      'policeClearanceCertificateImage':
-          policeClearanceCertificateOrJudgementCopyImage,
-      'aadhaarCardFrontImage': aadhaarCardFrontImage,
-      'aadhaarCardBackImage': aadhaarCardBackImage,
-      'panImage': panCardImage,
-      'registrationCertificateImage': registrationCertificateImage,
-      'vehicleInsuranceImage': vehicleInsuranceImage,
-      'certificateOfFitnessImage': certificateOfFitnessImage,
-      'vehiclePermitImage': vehiclePermitImage,
-    };
-
-    // Map to store Base64 encoded images
-    Map<String, dynamic> encodedImages = {};
-    // Loop through each image and encode it
-
-    for (var entry in images.entries) {
-      if (entry.value != null) {
-        var compressedImage = await _compressImage(entry.value!);
-
-        if (compressedImage != null) {
-          String base64Image = base64Encode(compressedImage);
-          encodedImages[entry.key] = base64Image;
-
-          // Calculate Image Size
-          // int byteSize = compressedImage.lengthInBytes; // Directly get byte length
-          // double sizeMB = byteSize / (1024 * 1024);
-
-          // print('${entry.key.runtimeType} compressed size: ${sizeMB.toStringAsFixed(2)} MB');
-        }
-      }
-    }
-
     try {
-      await FirebaseFirestore.instance
-          .collection('Driver_Registration')
-          .doc()
-          .set({
-            // Driver Personl details
-            "driverName": driverName,
-            "driverMobileNumber": driverMobileNumber,
-            "driverAddress": driverAddress,
-            "driverEmail": driverEmail,
-            // "areYouMemberOfAnyUnion": areYouMemberOfAnyUnion,
-            "memberOfUnionname": memberOfUnionName,
+      DocumentReference docRef =
+          FirebaseFirestore.instance.collection('Driver_Registration').doc();
 
-            // Driver Requirements ID Numbers
-            "bankPassBookOrCheckNumber": bankPassBookOrCheckNumber,
-            "policeClearanceCertificateOrJudgementCopyNumber":
-                policeClearanceCertificateOrJudgementCopy,
-            "aadhaarCardNumber": aadhaarCard,
-            "panCardNumber": panCard,
+      // Store basic driver details
+      await docRef.set({
+        "NAME": driverName,
+        "PHONE": driverMobileNumber,
+        "ADDRESS": driverAddress,
+        "UNION_NAME": memberOfUnionName,
+        "UNION_ID": unionDocId,
 
-            // Vehicle Requirements ID Numbers
-            "registrationCertificateNumber": registrationCertificate,
-            "vehicleInsuranceNumber": vehicleInsurance,
-            "certificateOfFitnessNumber": certificateOfFitness,
-            "vehiclePermitNumber": vehiclePermit,
+        ///
+        "ADDED_BY": 'ADMIN',
 
-            // Driver Requirements Images
-            'bankPassBookImages': encodedImages['bankPassBookImages'],
-            'policeClearanceCertificateImage':
-                encodedImages['policeClearanceCertificateImage'],
-            'aadhaarCardFrontImage': encodedImages['aadhaarCardFrontImage'],
-            'aadhaarCardBackImage': encodedImages['aadhaarCardBackImage'],
-            'panImage': encodedImages['panImage'],
+        ///
+        "ADDED_TYPE": 'ADMIN',
 
-            // vehicle Requirements Images
-            'registrationCertificateImage':
-                encodedImages['registrationCertificateImage'],
-            'vehicleInsuranceImage': encodedImages['vehicleInsuranceImage'],
-            'certificateOfFitnessImage':
-                encodedImages['certificateOfFitnessImage'],
-            'vehiclePermitImage': encodedImages['vehiclePermitImage'],
-          });
+        ///
+        "ADDED_DATE": Timestamp.now(),
+
+        ///
+        "STATUS": 'ACTIVE',
+
+        ///
+      });
+      // Store mapped fields with ID numbers and corresponding images
+      await _uploadDocument(
+        docRef,
+        "PASSBOOK",
+        bankPassBookOrCheckNumber,
+        bankPassBookOrCheckImage,
+      );
+      await _uploadDocument(
+        docRef,
+        "POLICE_CLEARENCE_CERTIFICATE",
+        policeClearanceCertificateOrJudgementCopy,
+        policeClearanceCertificateOrJudgementCopyImage,
+      );
+      await _uploadDocument(
+        docRef,
+        "ADHAAR",
+        aadhaarCardNumber,
+        aadhaarCardFrontImage,
+      );
+      await _uploadDocument(docRef, "PAN_CARD", panCardNumber, panCardImage);
+      await _uploadDocument(
+        docRef,
+        "VEHICLE_REGISTRATION_CERTIFICATE",
+        registrationCertificateNumber,
+        registrationCertificateImage,
+      );
+      await _uploadDocument(
+        docRef,
+        "VEHICLE_INSURANCE_CERTIFICATE",
+        vehicleInsuranceNumber,
+        vehicleInsuranceImage,
+      );
+      await _uploadDocument(
+        docRef,
+        "VEHICLE_FITNESS_CERTIFICATE",
+        certificateOfFitnessNumber,
+        certificateOfFitnessImage,
+      );
+      await _uploadDocument(
+        docRef,
+        "VEHICLE_PERMIT",
+        vehiclePermitNumber,
+        vehiclePermitImage,
+      );
 
       print("Driver details successfully saved.");
     } on FirebaseException catch (e) {
@@ -117,18 +112,40 @@ class DBDriverRegistration {
     }
   }
 
+  /// Uploads ID Number and corresponding image as a **map** in Firestore.
+  Future<void> _uploadDocument(
+    DocumentReference docRef,
+    String fieldName,
+    String idNumber,
+    File? imageFile,
+  ) async {
+    try {
+      Map<String, dynamic> documentData = {"NUMBER": idNumber};
+
+      if (imageFile != null) {
+        Uint8List? compressedImage = await _compressImage(imageFile);
+        if (compressedImage != null) {
+          documentData["PHOTO"] = base64Encode(compressedImage);
+        }
+      }
+
+      await docRef.update({fieldName: documentData});
+      print("$fieldName uploaded successfully.");
+    } catch (e) {
+      print("Error uploading $fieldName: $e");
+    }
+  }
+
+  /// Compress image before uploading
   Future<Uint8List?> _compressImage(File file) async {
     try {
-      Uint8List? compressedBytes = await FlutterImageCompress.compressWithList(
-        await file.readAsBytes(), // Read file as bytes
-        quality: 50, // Compression quality (0-100)
-        minWidth: 800, // Set desired width
-        minHeight: 200, // Set desired height
-        format: CompressFormat.jpeg, // Ensure compressed format
+      return await FlutterImageCompress.compressWithList(
+        await file.readAsBytes(),
+        quality: 40,
+        minWidth: 700,
+        minHeight: 200,
+        format: CompressFormat.jpeg,
       );
-
-      print("Compressed image size: ${compressedBytes.lengthInBytes} bytes");
-      return compressedBytes;
     } catch (e) {
       print("Image compression failed: $e");
       return null;

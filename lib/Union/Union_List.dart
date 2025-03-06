@@ -203,7 +203,10 @@ Widget _buildUnionList() {
                         context,
                         MaterialPageRoute(
                           builder:
-                              (context) => DriverList(union: union.unionName),
+                              (context) => DriverList(
+                                union: union.unionName,
+                                unionDocId: union.id,
+                              ),
                         ),
                       ),
                 );

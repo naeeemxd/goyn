@@ -11,8 +11,9 @@ import 'package:goyn/customwidgets.dart/Custom_Widgets.dart';
 import 'package:provider/provider.dart';
 
 class DriverRegistrationScreen extends StatelessWidget {
-  const DriverRegistrationScreen({super.key, this.union});
+  const DriverRegistrationScreen({super.key, this.union, this.unionDocId});
   final String? union;
+  final String? unionDocId;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +48,7 @@ class DriverRegistrationScreen extends StatelessWidget {
             ),
             SizedBox(height: 5),
             ListView.builder(
-              itemCount: 4,
+              itemCount: 3,
               physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               itemBuilder:
@@ -57,14 +58,12 @@ class DriverRegistrationScreen extends StatelessWidget {
                       keyboardType:
                           index == 1 ? TextInputType.phone : TextInputType.text,
                       // maxlength: index == 1 ? 10 : 500,
-                      label:
-                          ['Name', 'Mobile number', 'Address', 'Email'][index],
+                      label: ['Name', 'Mobile number', 'Address'][index],
                       controller:
                           [
                             registrationProvider.driverNameController,
                             registrationProvider.driverMobileNumberController,
                             registrationProvider.driverAddressController,
-                            registrationProvider.driverEmailController,
                           ][index],
                     ),
                   ),
@@ -262,50 +261,44 @@ class DriverRegistrationScreen extends StatelessWidget {
                                   registrationProvider
                                       .driverAddressController
                                       .text,
-                              driverEmail:
-                                  registrationProvider
-                                      .driverEmailController
-                                      .text,
-                              //
-                              // areYouMemberOfAnyUnion:
-                              //     registrationProvider
-                              //         .isUnionMemberOfAnyOtherUnion,
                               memberOfUnionName:
                                   registrationProvider.selectedUnionName,
-                              //
                               bankPassBookOrCheckNumber:
                                   registrationProvider
                                       .bankPassBookOrCheckNumberController
                                       .text,
+                              unionDocId: unionDocId ?? '',
                               policeClearanceCertificateOrJudgementCopy:
                                   registrationProvider
                                       .policeClearenceCertificateOrJudgementCopyController
                                       .text,
-                              aadhaarCard:
+                              aadhaarCardNumber:
                                   registrationProvider
                                       .aadhaarCardController
                                       .text,
-                              panCard:
+                              panCardNumber:
                                   registrationProvider.panCardController.text,
-                              //
-                              registrationCertificate:
+
+                              // ✅ Change `registrationCertificate` to `registrationCertificateNumber`
+                              registrationCertificateNumber:
                                   registrationProvider
                                       .registrationCertificateController
                                       .text,
-                              vehicleInsurance:
+                              vehicleInsuranceNumber:
                                   registrationProvider
                                       .vehicleInsuranceController
                                       .text,
-                              certificateOfFitness:
+                              certificateOfFitnessNumber:
                                   registrationProvider
                                       .certificateOfFitnessController
                                       .text,
-                              vehiclePermit:
+                              vehiclePermitNumber:
                                   registrationProvider
                                       .vehiclePermitController
                                       .text,
-                              //
-                              bankPassBookOrCheckImages:
+
+                              // Images
+                              bankPassBookOrCheckImage:
                                   registrationProvider.bankPassBookImage,
                               policeClearanceCertificateOrJudgementCopyImage:
                                   registrationProvider
@@ -315,7 +308,7 @@ class DriverRegistrationScreen extends StatelessWidget {
                               aadhaarCardBackImage:
                                   registrationProvider.aadhaarCardBackSideImage,
                               panCardImage: registrationProvider.panCardImage,
-                              //
+
                               registrationCertificateImage:
                                   registrationProvider
                                       .registrationCertificateImage,

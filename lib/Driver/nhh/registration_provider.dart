@@ -111,31 +111,29 @@ class RegistrationProvider extends ChangeNotifier {
   TextEditingController driverNameController = TextEditingController();
   TextEditingController driverMobileNumberController = TextEditingController();
   TextEditingController driverAddressController = TextEditingController();
-  TextEditingController driverEmailController = TextEditingController();
   // Are u a member of any union Yes or No Bool variable.
-  // if the variable is true the value is Yes (Yes, a Member of a Union). otherwise (No, have't membership of any Unions)
-  String isUnionMemberOfAnyOtherUnion = '';
-  // Union Selecting Dropdown variable
+  // // if the variable is true the value is Yes (Yes, a Member of a Union). otherwise (No, have't membership of any Unions)
+  // String isUnionMemberOfAnyOtherUnion = '';
+  // // Union Selecting Dropdown variable
   String selectedUnionName = "Select Union";
 
 // Setiing user input of "Yes" or "No". Are u a Member of any union
-  void setIsUnionMemberOfAnyOtherUnion(String value) {
-    isUnionMemberOfAnyOtherUnion = value;
-    notifyListeners();
-  }
+  // void setIsUnionMemberOfAnyOtherUnion(String value) {
+  //   isUnionMemberOfAnyOtherUnion = value;
+  //   notifyListeners();
+  // }
 
 // Setiing user input of union Select from drop Down
-  void setSelectedUnion(value) {
-    selectedUnionName = value;
-    notifyListeners();
-  }
+  // void setSelectedUnion(value) {
+  //   selectedUnionName = value;
+  //   notifyListeners();
+  // }
 
   bool isRegistrationProccessCompleted() {
     bool isCompleted = false;
     isCompleted = driverNameController.text != '' &&
         driverMobileNumberController.text != '' &&
         driverAddressController.text != '' &&
-        driverEmailController.text != '' &&
         bankPassBookProccessCompleted &&
         policeClearenceCertificateOrJudgementCopyProcessCompleted &&
         aadhaarCardProcessCompleted &&

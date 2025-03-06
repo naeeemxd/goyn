@@ -1,23 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:goyn/Driver/Driver_Details.dart';
 import 'package:goyn/Driver/nhh/registration.dart';
 import 'package:goyn/customwidgets.dart/Custom_Widgets.dart';
 import 'package:goyn/provider/DriverlistProvider.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class DriverList extends StatelessWidget {
-  const DriverList({super.key, this.union});
-  final String? union; // ✅ Nullable to prevent errors
+class DriverList extends StatefulWidget {
+  const DriverList({super.key, this.union, this.unionDocId});
+  final String? union;
+    final String? unionDocId;
+
+
+  @override
+  _DriverListState createState() => _DriverListState();
+}
+
+class _DriverListState extends State<DriverList> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, () {
+      Provider.of<DriverlistProvider>(context, listen: false).fetchDrivers();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: 'Union'),
-
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          navigateTo(context, DriverRegistrationScreen(union: union));
+          navigateTo(context, DriverRegistrationScreen(union: widget.union, ));
         },
         backgroundColor: const Color(0xFFF0AC00),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -41,7 +56,7 @@ class DriverList extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _LocationHeader(union: union),
+            _LocationHeader(union: widget.union),
             SizedBox(height: 10),
             _SearchBar(),
             SizedBox(height: 15),
@@ -138,13 +153,19 @@ class _DriversList extends StatelessWidget {
     final driverProvider = Provider.of<DriverlistProvider>(context);
     final filteredDrivers = driverProvider.filteredDrivers;
 
+    if (filteredDrivers.isEmpty) {
+      return Center(child: Text("No drivers found"));
+    }
+
     return ListView.builder(
       physics: BouncingScrollPhysics(),
       itemCount: filteredDrivers.length,
       itemBuilder: (context, index) {
         final driver = filteredDrivers[index];
         return GestureDetector(
-          // onTap: () => navigateTo(context, DriverDetailsPage()),
+          onTap: () {
+            navigateTo(context, DriverDetailsPage());
+          },
           child: DriverCard(driver: driver),
         );
       },

@@ -35,9 +35,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => DropdownProvider()),
         ChangeNotifierProvider(create: (_) => UnionProvider()),
         ChangeNotifierProvider(create: (_) => RegistrationProvider()),
-
-        // ChangeNotifierProvider(create: (_) => OtpVerificationProvider(otp: otp, phoneNumber: phoneNumber)),
-      ],
+              ],
 
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

@@ -1,6 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-// Driver Model
 class Driver {
   final String id;
   final String name;
@@ -13,103 +13,58 @@ class Driver {
     required this.phone,
     required this.imageUrl,
   });
+
+  // Convert Firestore document to Driver model
+  factory Driver.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return Driver(
+      id: doc.id,
+      name: data['NAME'] ?? 'Unknown',
+      phone: data['PHONE'] ?? 'No Number',
+      imageUrl:
+          data['profileImage'] ??
+          'https://tse4.mm.bing.net/th?id=OIP.OYbzbbyzogwtriubL2pP0AHaHa&pid=Api&P=0&h=220',
+    );
+  }
 }
 
-// DriverlistProvider
-class DriverlistProvider with ChangeNotifier {
-  List<Driver> _drivers = [
-    Driver(
-      id: '1',
-      name: 'Muhammed Junaid C',
-      phone: '98765 43210',
-      imageUrl: 'https://loremflickr.com/320/240/person',
-    ),
-    Driver(
-      id: '2',
-      name: 'John Doe',
-      phone: '12345 67890',
-      imageUrl: 'https://loremflickr.com/320/240/man',
-    ),
-    Driver(
-      id: '3',
-      name: 'Jane Smith',
-      phone: '54321 09876',
-      imageUrl: 'https://loremflickr.com/320/240/woman',
-    ),
-    Driver(
-      id: '1',
-      name: 'Muhammed Junaid C',
-      phone: '98765 43210',
-      imageUrl: 'https://loremflickr.com/320/240/person',
-    ),
-    Driver(
-      id: '2',
-      name: 'John Doe',
-      phone: '12345 67890',
-      imageUrl: 'https://loremflickr.com/320/240/man',
-    ),
-    Driver(
-      id: '3',
-      name: 'Jane Smith',
-      phone: '54321 09876',
-      imageUrl: 'https://loremflickr.com/320/240/woman',
-    ),
-    Driver(
-      id: '1',
-      name: 'Muhammed Junaid C',
-      phone: '98765 43210',
-      imageUrl: 'https://loremflickr.com/320/240/person',
-    ),
-    Driver(
-      id: '2',
-      name: 'John Doe',
-      phone: '12345 67890',
-      imageUrl: 'https://loremflickr.com/320/240/man',
-    ),
-    Driver(
-      id: '3',
-      name: 'Jane Smith',
-      phone: '54321 09876',
-      imageUrl: 'https://loremflickr.com/320/240/woman',
-    ),
-    // Add more drivers as needed
-  ];
+class DriverlistProvider extends ChangeNotifier {
+  List<Driver> _drivers = [];
+  List<Driver> _filteredDrivers = [];
 
-  String _searchQuery = '';
+  List<Driver> get filteredDrivers => _filteredDrivers;
 
-  // Getter for the list of drivers
-  List<Driver> get drivers => _drivers;
+  // Fetch Data from Firestore
+  Future<void> fetchDrivers() async {
+    try {
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance
+              .collection('Driver_Registration')
+              .get();
 
-  // Getter for the filtered list of drivers
-  List<Driver> get filteredDrivers {
-    if (_searchQuery.isEmpty) {
-      return _drivers;
-    } else {
-      return _drivers
-          .where(
-            (driver) =>
-                driver.name.toLowerCase().contains(_searchQuery.toLowerCase()),
-          )
-          .toList();
+      _drivers = snapshot.docs.map((doc) => Driver.fromFirestore(doc)).toList();
+      _filteredDrivers = _drivers; // Initially, filtered list = full list
+
+      notifyListeners();
+    } catch (e) {
+      print("Error fetching drivers: $e");
     }
   }
 
-  // Setter for the search query
+  // Search Filter
   void setSearchQuery(String query) {
-    _searchQuery = query;
-    notifyListeners(); // Notify listeners to rebuild the UI
-  }
-}
-
-class FilterProvider with ChangeNotifier {
-  String _currentFilter = 'All';
-
-  // Getter for the current filter
-  String get currentFilter => _currentFilter;
-
-  // Setter for the current filter
-  void setFilter(String filter) {
-    _currentFilter = filter;
-    notifyListeners(); // Notify listeners to rebuild the UI
+    if (query.isEmpty) {
+      _filteredDrivers = _drivers;
+    } else {
+      _filteredDrivers =
+          _drivers
+              .where(
+                (driver) =>
+                    driver.name.toLowerCase().contains(query.toLowerCase()) ||
+                    driver.phone.contains(query),
+              )
+              .toList();
+    }
+    notifyListeners();
   }
 }

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:goyn/Union/unionEdit.dart';
 import 'package:goyn/provider/Union_Provider.dart';
+import 'package:goyn/unnreg.dart';
 import 'package:provider/provider.dart';
 import 'package:goyn/Driver/Driver_List.dart';
 import 'package:goyn/Union/Union_Registration.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class GoynHomePageContent extends StatelessWidget {
   const GoynHomePageContent({super.key});
@@ -65,11 +68,11 @@ PreferredSizeWidget _buildAppBar(BuildContext context) {
       Padding(
         padding: const EdgeInsets.only(right: 15.0),
         child: GestureDetector(
-          onTap:
-              () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DriverList()),
-              ),
+          // onTap:
+          //     () => Navigator.push(
+          //       context,
+          //       MaterialPageRoute(builder: (context) => DriverList()),
+          //     ),
           child: const _ProfileIcon(),
         ),
       ),
@@ -187,18 +190,21 @@ Widget _buildUnionList() {
                 ),
               );
             }
-
             return ListView.builder(
               itemCount: filteredUnions.length,
               itemBuilder: (context, index) {
                 final union = filteredUnions[index];
                 return UnionListItem(
                   name: union.unionName,
+                  unionDocId: union.id,
                   drivers: '0',
                   onTap:
                       () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => DriverList()),
+                        MaterialPageRoute(
+                          builder:
+                              (context) => DriverList(union: union.unionName),
+                        ),
                       ),
                 );
               },
@@ -236,37 +242,83 @@ class _ProfileIcon extends StatelessWidget {
 }
 
 // Union List Item
+
 class UnionListItem extends StatelessWidget {
   final String name;
   final String drivers;
+  final String unionDocId;
   final VoidCallback? onTap;
 
   const UnionListItem({
     Key? key,
     required this.name,
     required this.drivers,
+    required this.unionDocId,
     this.onTap,
   }) : super(key: key);
+
+  static const _boxDecoration = BoxDecoration(
+    borderRadius: BorderRadius.all(Radius.circular(10)),
+  );
+
+  static const _subtitleStyle = TextStyle(color: Colors.grey);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15.0),
-      child: InkWell(
+      child: GestureDetector(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(15),
         child: Container(
           height: 71,
-          decoration: _boxDecoration.copyWith(color: Colors.white),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-            leading: _buildLeadingIcon(),
-            title: Text(
-              name,
-              style: const TextStyle(fontWeight: FontWeight.w500),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2), // Shadow color
+                spreadRadius: .5, // Spread radius
+                blurRadius: .5, // Blur radius
+                offset: const Offset(1, 1), // changes position of shadow
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Row(
+              children: [
+                _buildLeadingIcon(),
+                const SizedBox(width: 10), // Add some spacing
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        name,
+                        style: const TextStyle(fontWeight: FontWeight.w500),
+                      ),
+                      Text("Number of drivers $drivers", style: _subtitleStyle),
+                    ],
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    navigateTo(context, UnionEdit(unionDocId: unionDocId));
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 20.0),
+                    child: const Icon(
+                      Icons.edit,
+                      color: Colors.black,
+                      size: 15,
+                    ),
+                  ),
+                ),
+
+                const Icon(Icons.chevron_right, color: Colors.black),
+              ],
             ),
-            subtitle: Text("Number of drivers $drivers", style: _subtitleStyle),
-            trailing: const Icon(Icons.chevron_right, color: Colors.black),
           ),
         ),
       ),

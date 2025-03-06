@@ -1,417 +1,285 @@
-// ///union reg with paged
-// import 'package:flutter/material.dart';
-// import 'package:flutter_svg/svg.dart';
-// import 'package:google_fonts/google_fonts.dart';
-// import 'package:goyn/Driver/Driver_List.dart';
-// import 'package:goyn/Union/Union_Registration.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:goyn/provider/Union_Provider.dart';
-// import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:goyn/Driver/Driver_Edit.dart';
+import 'package:goyn/customwidgets.dart/custom_button.dart';
 
-// class GoynHomePageContent extends StatelessWidget {
-//   const GoynHomePageContent({super.key});
+class CustomTextField extends StatelessWidget {
+  final String label;
+  final TextEditingController controller;
+  final TextInputType? keyboardType;
+  final double height;
+  final bool enabled; // New parameter to enable/disable editing
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       floatingActionButton: _buildFloatingButton(context),
-//       appBar: _buildAppBar(context),
-//       body: SafeArea(
-//         child: Padding(
-//           padding: const EdgeInsets.all(16.0),
-//           child: Column(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: [
-//               const SizedBox(height: 16),
-//               _buildSearchBar(context),
-//               const SizedBox(height: 16),
-//               _buildStatsRow(),
-//               const SizedBox(height: 16),
-//               _buildPaginatedUnionList(),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
+  const CustomTextField({
+    super.key,
+    required this.label,
+    required this.controller,
+    this.keyboardType,
+    this.height = 52, // Default height value
+    this.enabled = true, // Default to editable
+  });
 
-//   // Floating action button
-//   Widget _buildFloatingButton(BuildContext context) {
-//     return FloatingActionButton.extended(
-//       onPressed: () => Navigator.push(
-//         context,
-//         MaterialPageRoute(builder: (context) => const UnionRegistration()),
-//       ),
-//       backgroundColor: const Color(0xFFF0AC00),
-//       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-//       label: const Row(
-//         children: [
-//           Text("Add Union ", style: _buttonTextStyle),
-//           SizedBox(width: 5),
-//           Icon(Icons.add, color: Colors.white, size: 18),
-//         ],
-//       ),
-//     );
-//   }
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        color: enabled ? Color(0xFFF5F5F5) : Colors.grey[300], // Different color for disabled
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 15),
+        child: TextField(
+          keyboardType: keyboardType,
+          controller: controller,
+          enabled: enabled, // Makes the field uneditable when false
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 16,
+            color: enabled ? Colors.black : Colors.grey[700], // Dimmed text when disabled
+          ),
+          decoration: InputDecoration(
+            labelText: label,
+            labelStyle: TextStyle(
+              fontWeight: FontWeight.w400,
+              fontSize: 15,
+              color: Colors.grey[600],
+            ),
+            border: InputBorder.none,
+          ),
+        ),
+      ),
+    );
+  }
+}
 
-//   // AppBar
-//   PreferredSizeWidget _buildAppBar(BuildContext context) {
-//     return AppBar(
-//       automaticallyImplyLeading: false,
-//       title: Image.asset("assets/images/logo.png", width: 120, height: 40),
-//       backgroundColor: Colors.transparent,
-//       surfaceTintColor: Colors.transparent,
-//       actions: [
-//         Padding(
-//           padding: const EdgeInsets.only(right: 15.0),
-//           child: GestureDetector(
-//             onTap: () => Navigator.push(
-//               context,
-//               MaterialPageRoute(builder: (context) => DriverList()),
-//             ),
-//             child: const _ProfileIcon(),
-//           ),
-//         ),
-//       ],
-//     );
-//   }
 
-//   // Search Bar
-//   Widget _buildSearchBar(BuildContext context) {
-//     return Consumer<UnionProvider>(
-//       builder: (context, provider, child) {
-//         return Container(
-//           padding: const EdgeInsets.symmetric(horizontal: 5),
-//           child: TextField(
-//             onChanged: provider.search,
-//             decoration: InputDecoration(
-//               contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-//               filled: true,
-//               fillColor: const Color(0xffF5F5F5),
-//               border: OutlineInputBorder(
-//                 borderRadius: BorderRadius.circular(10),
-//                 borderSide: BorderSide.none,
-//               ),
-//               hintText: "Search Union",
-//               hintStyle: GoogleFonts.openSans(
-//                 fontWeight: FontWeight.w400,
-//                 fontSize: 14,
-//               ),
-//               suffixIcon: Padding(
-//                 padding: const EdgeInsets.all(10),
-//                 child: SvgPicture.asset("assets/icons/search.svg"),
-//               ),
-//             ),
-//           ),
-//         );
-//       },
-//     );
-//   }
+class CustomBottomAppBar extends StatelessWidget {
+  final String buttonTitle;
+  final VoidCallback onButtonTap;
+  final Color backgroundColor;
+  final double height;
+  final double horizontalPadding;
+  final double verticalPadding;
 
-//   // Stats row
-//  // Stats row
-// Widget _buildStatsRow() {
-//   return FutureBuilder<AggregateQuerySnapshot>(
-//     future: FirebaseFirestore.instance.collection('unions').count().get(),
-//     builder: (context, snapshot) {
-//       // Fix for the type error - use null safety operator with a default value
-//       int unionCount = snapshot.hasData ? (snapshot.data!.count ?? 0) : 0;
+  const CustomBottomAppBar({
+    super.key,
+    required this.buttonTitle,
+    required this.onButtonTap,
+    this.backgroundColor = Colors.white,
+    this.height = 0.1, // Relative to screen height
+    this.horizontalPadding = 0.04, // Relative to screen width
+    this.verticalPadding = 0.01, // Relative to screen height
+  });
 
-//       return Padding(
-//         padding: const EdgeInsets.only(left: 4.0),
-//         child: Row(
-//           children: [
-//             const Text("Number of Unions ", style: _statTextStyle),
-//             _buildStatNumber(unionCount),
-//             const SizedBox(width: 5),
-//             Image.asset("assets/icons/divider.png"),
-//             const SizedBox(width: 6),
-//             const Text("Number of Drivers ", style: _statTextStyle),
-//             _buildStatNumber(0), // Replace with actual driver count if available
-//           ],
-//         ),
-//       );
-//     },
-//   );
-// }
+  @override
+  Widget build(BuildContext context) {
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
 
-//   Widget _buildStatNumber(int number) {
-//     return Container(
-//       padding: const EdgeInsets.symmetric(horizontal: 4),
-//       child: Text(
-//         "$number",
-//         style: const TextStyle(
-//           fontWeight: FontWeight.bold,
-//           fontSize: 15,
-//           color: Colors.purple,
-//         ),
-//       ),
-//     );
-//   }
+    return BottomAppBar(
+      color: backgroundColor,
+      height: screenHeight * height,
+      padding: EdgeInsets.symmetric(
+        horizontal: screenWidth * horizontalPadding,
+        vertical: screenHeight * verticalPadding,
+      ),
+      child: Column(
+        children: [CustomButton(title: buttonTitle, onTap: onButtonTap)],
+      ),
+    );
+  }
+}
 
-//   // Paginated Union list
-//   Widget _buildPaginatedUnionList() {
-//     return Expanded(
-//       child: PaginatedUnionsList(),
-//     );
-//   }
-// }
+class ConfirmationDialog extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 0,
+      backgroundColor: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Delete Driver?',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: Colors.red,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Are you sure you want to delete this driver? This action cannot be undone',
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Color(0xFFEA0004),
+                      elevation: 0,
+                      side: const BorderSide(color: Colors.black12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: Text(
+                      'Delete',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFFEA0004),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Color(0xFFF0AC00),
+                      borderRadius: BorderRadius.circular(
+                        24,
+                      ), // Match button shape
+                    ),
+                    child: CustomButton(
+                      title: 'Edit',
+                      borderRadius: BorderRadius.circular(24),
+                      onTap: () {
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => DriverEditScreen(),
+                        //   ),
+                        // );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-// class PaginatedUnionsList extends StatefulWidget {
-//   const PaginatedUnionsList({Key? key}) : super(key: key);
+void showDeleteConfirmationDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return ConfirmationDialog();
+    },
+  );
+}
 
-//   @override
-//   _PaginatedUnionsListState createState() => _PaginatedUnionsListState();
-// }
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final VoidCallback? onBackPress;
 
-// class _PaginatedUnionsListState extends State<PaginatedUnionsList> {
-//   final int _pageSize = 10;
-//   final List<DocumentSnapshot> _unions = [];
-//   bool _isLoading = false;
-//   bool _hasMoreData = true;
-//   DocumentSnapshot? _lastDocument;
-//   final ScrollController _scrollController = ScrollController();
+  const CustomAppBar({Key? key, required this.title, this.onBackPress})
+    : super(key: key);
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     _fetchInitialData();
-//     _scrollController.addListener(_scrollListener);
-//   }
+  @override
+  Widget build(BuildContext context) {
+    return PreferredSize(
+      preferredSize: const Size.fromHeight(80),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 10.0),
+        child: AppBar(
+          backgroundColor: const Color(0x08000000),
+          surfaceTintColor: Colors.transparent,
+          elevation: 1,
+          title: Text(
+            title,
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 19,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          centerTitle: true,
+          leading: IconButton(
+            icon: SvgPicture.asset("assets/icons/back_arrow.svg"),
+            onPressed: onBackPress ?? () => Navigator.pop(context),
+          ),
+        ),
+      ),
+    );
+  }
 
-//   @override
-//   void dispose() {
-//     _scrollController.removeListener(_scrollListener);
-//     _scrollController.dispose();
-//     super.dispose();
-//   }
+  @override
+  Size get preferredSize => const Size.fromHeight(80);
+}
 
-//   void _scrollListener() {
-//     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent * 0.8) {
-//       if (!_isLoading && _hasMoreData) {
-//         _fetchMoreData();
-//       }
-//     }
-//   }
+class CustomButton extends StatelessWidget {
+  final String title;
+  final VoidCallback onTap;
+  final double width;
+  final double height;
+  final Color color;
+  final Color borderColor;
+  final Color titleColor;
+  final BorderRadius borderRadius;
 
-//   Future<void> _fetchInitialData() async {
-//     if (_isLoading) return;
+  const CustomButton({
+    super.key,
+    required this.title,
+    required this.onTap,
+    this.width = double.infinity,
+    this.height = 50,
+    this.color = const Color(0xFFF0AC00),
+    this.borderColor = Colors.transparent,
+    this.titleColor = Colors.white,
+    this.borderRadius = const BorderRadius.all(Radius.circular(15)),
+  });
 
-//     setState(() {
-//       _isLoading = true;
-//     });
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: height,
+        width: width,
+        decoration: BoxDecoration(
+          borderRadius: borderRadius,
+          color: color,
+          border: Border.all(color: borderColor),
+        ),
+        child: Center(
+          child: Text(
+            title,
+            style: GoogleFonts.openSans(
+              fontSize: 16,
+              color: titleColor,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
-//     try {
-//       final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-//           .collection('unions')
-//           .orderBy('union_name')
-//           .limit(_pageSize)
-//           .get();
-
-//       if (querySnapshot.docs.isNotEmpty) {
-//         setState(() {
-//           _unions.clear();
-//           _unions.addAll(querySnapshot.docs);
-//           _lastDocument = querySnapshot.docs.last;
-//           _hasMoreData = querySnapshot.docs.length == _pageSize;
-//         });
-//       } else {
-//         setState(() {
-//           _hasMoreData = false;
-//         });
-//       }
-//     } catch (e) {
-//       print('Error fetching unions: $e');
-//     } finally {
-//       setState(() {
-//         _isLoading = false;
-//       });
-//     }
-//   }
-
-//   Future<void> _fetchMoreData() async {
-//     if (_isLoading || !_hasMoreData || _lastDocument == null) return;
-
-//     setState(() {
-//       _isLoading = true;
-//     });
-
-//     try {
-//       final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-//           .collection('unions')
-//           .orderBy('union_name')
-//           .startAfterDocument(_lastDocument!)
-//           .limit(_pageSize)
-//           .get();
-
-//       if (querySnapshot.docs.isNotEmpty) {
-//         setState(() {
-//           _unions.addAll(querySnapshot.docs);
-//           _lastDocument = querySnapshot.docs.last;
-//           _hasMoreData = querySnapshot.docs.length == _pageSize;
-//         });
-//       } else {
-//         setState(() {
-//           _hasMoreData = false;
-//         });
-//       }
-//     } catch (e) {
-//       print('Error fetching more unions: $e');
-//     } finally {
-//       setState(() {
-//         _isLoading = false;
-//       });
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     if (_unions.isEmpty && _isLoading) {
-//       return const Center(child: CircularProgressIndicator());
-//     }
-
-//     if (_unions.isEmpty && !_hasMoreData) {
-//       return const Center(
-//         child: Text(
-//           'No unions found',
-//           style: TextStyle(color: Colors.grey, fontSize: 16),
-//         ),
-//       );
-//     }
-
-//     return Column(
-//       children: [
-//         Expanded(
-//           child: ListView.builder(
-//             controller: _scrollController,
-//             itemCount: _unions.length + (_hasMoreData ? 1 : 0),
-//             itemBuilder: (context, index) {
-//               if (index == _unions.length) {
-//                 return _buildLoadingIndicator();
-//               }
-
-//               final union = _unions[index];
-//               final unionName = union['union_name'];
-
-//               return UnionListItem(
-//                 name: unionName,
-//                 drivers: "0", // Placeholder for drivers count
-//                 onTap: () => Navigator.push(
-//                   context,
-//                   MaterialPageRoute(builder: (context) => DriverList()),
-//                 ),
-//               );
-//             },
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-
-//   Widget _buildLoadingIndicator() {
-//     return Container(
-//       padding: const EdgeInsets.all(8.0),
-//       alignment: Alignment.center,
-//       child: const CircularProgressIndicator(),
-//     );
-//   }
-// }
-
-// // Reusable Profile Icon Widget
-// class _ProfileIcon extends StatelessWidget {
-//   const _ProfileIcon();
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       width: 45,
-//       height: 45,
-//       decoration: const BoxDecoration(
-//         color: Color(0xFFF0AC00),
-//         shape: BoxShape.circle,
-//       ),
-//       child: ClipOval(
-//         child: SvgPicture.asset(
-//           "assets/icons/user.svg",
-//           width: 25,
-//           height: 25,
-//           fit: BoxFit.none,
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// // Union List Item
-// class UnionListItem extends StatelessWidget {
-//   final String name;
-//   final String drivers;
-//   final VoidCallback? onTap;
-
-//   const UnionListItem({
-//     Key? key,
-//     required this.name,
-//     required this.drivers,
-//     this.onTap,
-//   }) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.only(bottom: 15.0),
-//       child: InkWell(
-//         onTap: onTap,
-//         borderRadius: BorderRadius.circular(15),
-//         child: Container(
-//           height: 71,
-//           decoration: _boxDecoration.copyWith(color: Colors.white),
-//           child: ListTile(
-//             contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-//             leading: _buildLeadingIcon(),
-//             title: Text(
-//               name,
-//               style: const TextStyle(fontWeight: FontWeight.w500),
-//             ),
-//             subtitle: Text("Number of drivers $drivers", style: _subtitleStyle),
-//             trailing: const Icon(Icons.chevron_right, color: Colors.black),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-
-//   Widget _buildLeadingIcon() {
-//     return Container(
-//       width: 40,
-//       height: 40,
-//       decoration: _boxDecoration.copyWith(color: const Color(0xFFF8F8F8)),
-//       child: Padding(
-//         padding: const EdgeInsets.all(7.0),
-//         child: SvgPicture.asset("assets/icons/user-group-03.svg"),
-//       ),
-//     );
-//   }
-// }
-
-// // Reusable Styles
-// const _buttonTextStyle = TextStyle(
-//   color: Colors.white,
-//   fontWeight: FontWeight.w900,
-//   fontSize: 16,
-// );
-
-// const _statTextStyle = TextStyle(fontWeight: FontWeight.w800, fontSize: 15);
-
-// const _subtitleStyle = TextStyle(fontSize: 12, color: Colors.grey);
-
-// final _boxDecoration = BoxDecoration(
-//   borderRadius: BorderRadius.circular(15),
-//   boxShadow: [
-//     BoxShadow(
-//       color: Colors.black.withOpacity(0.1),
-//       spreadRadius: 0.5,
-//       blurRadius: 4,
-//       offset: const Offset(0, 0),
-//     ),
-//   ],
-// );
+void navigateTo(BuildContext context, Widget screen) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => screen,
+    ),
+  );
+}

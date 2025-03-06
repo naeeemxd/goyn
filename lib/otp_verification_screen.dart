@@ -2,38 +2,177 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:goyn/customwidgets.dart/Custom_Widgets.dart';
 import 'package:goyn/customwidgets.dart/otp_textfield.dart';
-import 'package:goyn/provider/otp_provider.dart';
-import 'package:provider/provider.dart';
+import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class OtpVerificationScreen extends StatelessWidget {
+class OtpVerificationScreen extends StatefulWidget {
   final String otp;
   final String phoneNumber;
 
   const OtpVerificationScreen({
-    Key? key,
+    super.key,
     required this.otp,
     required this.phoneNumber,
-  }) : super(key: key);
+  });
 
   @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create:
-          (_) => OtpVerificationProvider(otp: otp, phoneNumber: phoneNumber),
-      child: const OtpVerificationView(),
-      // dispose: (_, provider) => provider.dispose(),
-    );
-  }
+  _OtpVerificationScreenState createState() => _OtpVerificationScreenState();
 }
 
-class OtpVerificationView extends StatelessWidget {
-  const OtpVerificationView({Key? key}) : super(key: key);
+class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
+  final TextEditingController otpController = TextEditingController();
+  bool isLoading = false;
+  int _secondsRemaining = 60;
+  late Timer _timer;
+  bool _canResend = false;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    startTimer();
+  }
+
+  void startTimer() {
+    _secondsRemaining = 60;
+    _canResend = false;
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_secondsRemaining > 0) {
+          _secondsRemaining--;
+        } else {
+          _canResend = true;
+          _timer.cancel();
+        }
+      });
+    });
+  }
+
+  String get timerText {
+    final minutes = (_secondsRemaining / 60).floor();
+    final seconds = _secondsRemaining % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  Future<void> resendOTP() async {
+    if (!_canResend) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    // Here you would typically call your API to resend the OTP
+    // For this example, we'll just restart the timer and assume OTP was sent
+
+    setState(() {
+      isLoading = false;
+    });
+
+    startTimer();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("OTP has been resent to your phone number")),
+    );
+  }
+
+  // Save user to Firebase
+  Future<void> saveUserToFirebase(String phoneNumber) async {
+    try {
+      // Check if user already exists
+      final userDoc =
+          await _firestore.collection('users').doc(phoneNumber).get();
+
+      if (userDoc.exists) {
+        // User exists, update last login timestamp
+        await _firestore.collection('users').doc(phoneNumber).update({
+          'lastLogin': FieldValue.serverTimestamp(),
+          'loginCount': FieldValue.increment(1),
+        });
+      } else {
+        // User doesn't exist, create new user document
+        await _firestore.collection('users').doc(phoneNumber).set({
+          'phoneNumber': phoneNumber,
+          'createdAt': FieldValue.serverTimestamp(),
+          'lastLogin': FieldValue.serverTimestamp(),
+          'loginCount': 1,
+          'isActive': true,
+        });
+      }
+
+      return;
+    } catch (e) {
+      print('Error saving user to Firebase: $e');
+      throw e;
+    }
+  }
+
+  void verifyOtp() async {
+    String enteredOtp = otpController.text.trim();
+
+    if (enteredOtp.isEmpty || enteredOtp.length != 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter a valid 6-digit OTP.")),
+      );
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      // Verify that the entered OTP matches the one that was sent
+      if (enteredOtp == widget.otp) {
+        // OTP verification successful
+
+        // Save user to Firebase
+        await saveUserToFirebase(widget.phoneNumber);
+
+        // Store the user's authentication status
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isLoggedIn', true);
+        await prefs.setString('phoneNumber', widget.phoneNumber);
+
+        if (mounted) {
+          // Navigate to home screen
+          Navigator.pushReplacementNamed(context, '/home');
+        }
+      } else {
+        // OTP verification failed
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Incorrect OTP. Please enter the correct code."),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Error: ${e.toString()}")));
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-    final provider = Provider.of<OtpVerificationProvider>(context);
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -79,10 +218,7 @@ class OtpVerificationView extends StatelessWidget {
                     OTPTextField(
                       length: 6,
                       width: width,
-                      controller: provider.otpController,
-                      onCompleted: (pin) {
-                        provider.verifyOtp(context);
-                      },
+                      controller: otpController,
                     ),
                     SizedBox(height: height * 0.04),
                     Row(
@@ -97,14 +233,11 @@ class OtpVerificationView extends StatelessWidget {
                           ),
                         ),
                         GestureDetector(
-                          onTap:
-                              provider.canResend
-                                  ? () => provider.resendOTP(context)
-                                  : null,
+                          onTap: _canResend ? resendOTP : null,
                           child: Text(
-                            provider.canResend
+                            _canResend
                                 ? " Resend OTP"
-                                : " Resend in ${provider.timerText}",
+                                : " Resend in $timerText",
                             style: GoogleFonts.openSans(
                               fontSize: 12,
                               color: Color(0xFFF0AC00),
@@ -116,11 +249,8 @@ class OtpVerificationView extends StatelessWidget {
                     ),
                     SizedBox(height: height * 0.03),
                     CustomButton(
-                      title: provider.isLoading ? "Verifying..." : "Verify",
-                      onTap:
-                          provider.isLoading
-                              ? () {}
-                              : () => provider.verifyOtp(context),
+                      title: isLoading ? "Verifying..." : "Verify",
+                      onTap: isLoading ? () {} : verifyOtp,
                     ),
                     SizedBox(height: height * 0.04),
                   ],

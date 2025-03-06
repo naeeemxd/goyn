@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:goyn/Driver/Driver_Edit.dart';
+import 'package:goyn/customwidgets.dart/custom_button.dart';
 
 class CustomTextField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
   final TextInputType? keyboardType;
   final double height;
-  // Added height parameter
+  final bool enabled; // New parameter to enable/disable editing
 
   const CustomTextField({
     super.key,
@@ -16,14 +17,15 @@ class CustomTextField extends StatelessWidget {
     required this.controller,
     this.keyboardType,
     this.height = 52, // Default height value
+    this.enabled = true, // Default to editable
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: height, // Use the height parameter
+      height: height,
       decoration: BoxDecoration(
-        color: Color(0xFFF5F5F5),
+        color: enabled ? Color(0xFFF5F5F5) : Colors.grey[300], // Different color for disabled
         borderRadius: BorderRadius.circular(15),
       ),
       child: Padding(
@@ -31,7 +33,12 @@ class CustomTextField extends StatelessWidget {
         child: TextField(
           keyboardType: keyboardType,
           controller: controller,
-          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+          enabled: enabled, // Makes the field uneditable when false
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 16,
+            color: enabled ? Colors.black : Colors.grey[700], // Dimmed text when disabled
+          ),
           decoration: InputDecoration(
             labelText: label,
             labelStyle: TextStyle(
@@ -46,6 +53,7 @@ class CustomTextField extends StatelessWidget {
     );
   }
 }
+
 
 class CustomBottomAppBar extends StatelessWidget {
   final String buttonTitle;
@@ -151,10 +159,12 @@ class ConfirmationDialog extends StatelessWidget {
                       title: 'Edit',
                       borderRadius: BorderRadius.circular(24),
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => DriverEdit()),
-                        );
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => DriverEditScreen(),
+                        //   ),
+                        // );
                       },
                     ),
                   ),
@@ -266,5 +276,10 @@ class CustomButton extends StatelessWidget {
 }
 
 void navigateTo(BuildContext context, Widget screen) {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => screen));
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => screen,
+    ),
+  );
 }

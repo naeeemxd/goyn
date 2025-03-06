@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:goyn/customwidgets.dart/Custom_Widgets.dart';
 import 'package:goyn/login_screen.dart';
-import 'package:goyn/provider/Union_Provider.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UnionRegistration extends StatelessWidget {
@@ -39,7 +37,9 @@ class UnionRegistration extends StatelessWidget {
       return;
     }
 
-    String docId = unionName; // Generate timestamp ID
+    String docId =
+        DateTime.now().millisecondsSinceEpoch
+            .toString(); // Generate timestamp ID
 
     try {
       // Check if union with the same name already exists
@@ -77,7 +77,6 @@ class UnionRegistration extends StatelessWidget {
       unionController.clear();
       registrationController.clear();
       Navigator.pop(context);
-      Provider.of<UnionProvider>(context, listen: false).fetchUnions();
     } on FirebaseException catch (e) {
       // Handle Firestore-specific errors
       ScaffoldMessenger.of(context).showSnackBar(
@@ -141,6 +140,29 @@ class UnionRegistration extends StatelessWidget {
     );
   }
 }
+
+// Future<void> addDummyUnions() async {
+//   final CollectionReference unions = FirebaseFirestore.instance.collection(
+//     "unions",
+//   );
+
+//   for (int i = 1; i <= 100; i++) {
+//     String docId =
+//         DateTime.now().millisecondsSinceEpoch.toString(); // Unique ID
+
+//     await unions.doc(docId).set({
+//       "union_name": "Union $i",
+//       "registration_number": "REG-${1000 + i}",
+//       "created_at": FieldValue.serverTimestamp(),
+//     });
+
+//     await Future.delayed(
+//       const Duration(milliseconds: 50),
+//     ); // Small delay to avoid duplicates
+//   }
+
+//   print("✅ 100 Unions Added!");
+// }
 
 // Future<void> deleteAllUnions() async {
 //   final CollectionReference unions = FirebaseFirestore.instance.collection(

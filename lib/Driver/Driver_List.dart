@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:goyn/Driver/Driver_Details.dart';
-import 'package:goyn/Driver/Driver_Registration.dart';
-import 'package:goyn/Driver/ImageUtils.dart';
+import 'package:goyn/Driver/nhh/registration.dart';
 import 'package:goyn/customwidgets.dart/Custom_Widgets.dart';
 import 'package:goyn/provider/DriverlistProvider.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class DriverList extends StatelessWidget {
+  const DriverList({super.key, this.union});
+  final String? union; // ✅ Nullable to prevent errors
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: "Union"),
+      appBar: CustomAppBar(title: 'Union'),
+
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          navigateTo(context, AddDrivers());
+          navigateTo(context, DriverRegistrationScreen(union: union));
         },
         backgroundColor: const Color(0xFFF0AC00),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -39,7 +41,7 @@ class DriverList extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _LocationHeader(),
+            _LocationHeader(union: union),
             SizedBox(height: 10),
             _SearchBar(),
             SizedBox(height: 15),
@@ -53,6 +55,10 @@ class DriverList extends StatelessWidget {
 
 // Custom Widget for Location Header
 class _LocationHeader extends StatelessWidget {
+  final String? union;
+
+  const _LocationHeader({Key? key, this.union}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -72,7 +78,7 @@ class _LocationHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Malappuram',
+                union?.isNotEmpty == true ? union! : 'Union',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               Text(
@@ -138,7 +144,7 @@ class _DriversList extends StatelessWidget {
       itemBuilder: (context, index) {
         final driver = filteredDrivers[index];
         return GestureDetector(
-          onTap: () => navigateTo(context, DriverDetailsPage()),
+          // onTap: () => navigateTo(context, DriverDetailsPage()),
           child: DriverCard(driver: driver),
         );
       },

@@ -46,7 +46,7 @@ class UnionRegistration extends StatelessWidget {
       final querySnapshot =
           await FirebaseFirestore.instance
               .collection("unions")
-              .where("union_name", isEqualTo: unionName)
+              .where("UNION_NAME", isEqualTo: unionName)
               .get();
 
       if (querySnapshot.docs.isNotEmpty) {
@@ -61,8 +61,8 @@ class UnionRegistration extends StatelessWidget {
 
       // Add union to Firestore
       await FirebaseFirestore.instance.collection("unions").doc(docId).set({
-        "union_name": unionName,
-        "registration_number": registrationNumber,
+        "UNION_NAME": unionName,
+        "REGISTRATION_NUMBER": registrationNumber,
         "created_at": FieldValue.serverTimestamp(),
       });
 
@@ -151,8 +151,8 @@ class UnionRegistration extends StatelessWidget {
 //         DateTime.now().millisecondsSinceEpoch.toString(); // Unique ID
 
 //     await unions.doc(docId).set({
-//       "union_name": "Union $i",
-//       "registration_number": "REG-${1000 + i}",
+//       "UNION_NAME": "Union $i",
+//       "REGISTRATION_NUMBER": "REG-${1000 + i}",
 //       "created_at": FieldValue.serverTimestamp(),
 //     });
 

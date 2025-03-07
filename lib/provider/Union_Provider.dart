@@ -26,17 +26,18 @@ class UnionProvider with ChangeNotifier {
     fetchUnions();
   }
 
-  Future<void> fetchUnions() async {
-    final snapshot =
-        await FirebaseFirestore.instance.collection('unions').get();
-    _unions = snapshot.docs.map((doc) => Union.fromFirestore(doc)).toList();
-    notifyListeners();
+  void fetchUnions() {
+    FirebaseFirestore.instance.collection('unions').snapshots().listen((
+      snapshot,
+    ) {
+      _unions = snapshot.docs.map((doc) => Union.fromFirestore(doc)).toList();
+      notifyListeners();
+    });
   }
 
-  // Add this method to filter unions based on the search query
   List<Union> searchUnions(String query) {
     if (query.isEmpty) {
-      return _unions; // Return all unions if the query is empty
+      return _unions;
     }
     return _unions
         .where(

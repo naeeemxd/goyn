@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:goyn/Union/unionEdit.dart';
+import 'package:goyn/customwidgets.dart/Custom_Widgets.dart';
 import 'package:goyn/provider/Union_Provider.dart';
 import 'package:goyn/unnreg.dart';
 import 'package:provider/provider.dart';

@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class RegistrationProvider extends ChangeNotifier {
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Login Page Properties
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Login Page Properties
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////
   TextEditingController mobileNumberController = TextEditingController();
-  TextEditingController countryCodeController = TextEditingController(text: '+91');
-    TextEditingController UnionController = TextEditingController();
-
+  TextEditingController countryCodeController = TextEditingController(
+    text: '+91',
+  );
+  TextEditingController UnionController = TextEditingController();
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////
   final GlobalKey keyField = GlobalKey();
@@ -18,10 +19,10 @@ class RegistrationProvider extends ChangeNotifier {
   OverlayEntry? overlayEntry;
   bool isDropdownOpen = false;
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Country Code Drop Down Sheet Open and Closing Tongle Function. Working With is isDropDownOpen Boolean
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Country Code Drop Down Sheet Open and Closing Tongle Function. Working With is isDropDownOpen Boolean
   void toggleDropdown(double screenHeight) {
     if (isDropdownOpen) {
       closeDropdown();
@@ -30,10 +31,11 @@ class RegistrationProvider extends ChangeNotifier {
     }
   }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// opening Drop Down Sheet of Country Code in Login Page with Passing Screen Height,
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // opening Drop Down Sheet of Country Code in Login Page with Passing Screen Height,
   void openDropdown(double screenHeight) {
-    final RenderBox renderBox = keyField.currentContext!.findRenderObject() as RenderBox;
+    final RenderBox renderBox =
+        keyField.currentContext!.findRenderObject() as RenderBox;
     final double textFieldHeight = renderBox.size.height;
     final double textFieldTop = renderBox.localToGlobal(Offset.zero).dy;
 
@@ -53,47 +55,48 @@ class RegistrationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-// The Drop Down sheet of Cotry Code selecting in Login Screen
-  OverlayEntry createOverlayEntry(
-    bool showAbove,
-    double textFieldHeight,
-  ) {
+  //////////////////////////////////////////////////////////////////////////////////////////////////////
+  // The Drop Down sheet of Cotry Code selecting in Login Screen
+  OverlayEntry createOverlayEntry(bool showAbove, double textFieldHeight) {
     return OverlayEntry(
-      builder: (context) => Positioned(
-        width: 100,
-        child: CompositedTransformFollower(
-          link: layerLink,
-          showWhenUnlinked: false,
-          offset: showAbove ? Offset(0, -200 - 10) : Offset(0, textFieldHeight + 10),
-          child: Material(
-            elevation: 4,
-            borderRadius: BorderRadius.circular(10),
-            child: Container(
-              constraints: BoxConstraints(maxHeight: 200),
-              decoration: BoxDecoration(
-                color: Colors.white,
+      builder:
+          (context) => Positioned(
+            width: 100,
+            child: CompositedTransformFollower(
+              link: layerLink,
+              showWhenUnlinked: false,
+              offset:
+                  showAbove
+                      ? Offset(0, -200 - 10)
+                      : Offset(0, textFieldHeight + 10),
+              child: Material(
+                elevation: 4,
                 borderRadius: BorderRadius.circular(10),
-              ),
-              child: ListView.builder(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                itemCount: filteredCountries.length,
-                itemBuilder: (context, index) {
-                  final entry = filteredCountries[index];
-                  return ListTile(
-                    title: Text(entry.value),
-                    onTap: () {
-                      countryCodeController.text = entry.value;
-                      closeDropdown();
+                child: Container(
+                  constraints: BoxConstraints(maxHeight: 200),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    itemCount: filteredCountries.length,
+                    itemBuilder: (context, index) {
+                      final entry = filteredCountries[index];
+                      return ListTile(
+                        title: Text(entry.value),
+                        onTap: () {
+                          countryCodeController.text = entry.value;
+                          closeDropdown();
+                        },
+                      );
                     },
-                  );
-                },
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ),
     );
   }
 
@@ -117,13 +120,13 @@ class RegistrationProvider extends ChangeNotifier {
   // // Union Selecting Dropdown variable
   String selectedUnionName = "Select Union";
 
-// Setiing user input of "Yes" or "No". Are u a Member of any union
+  // Setiing user input of "Yes" or "No". Are u a Member of any union
   // void setIsUnionMemberOfAnyOtherUnion(String value) {
   //   isUnionMemberOfAnyOtherUnion = value;
   //   notifyListeners();
   // }
 
-// Setiing user input of union Select from drop Down
+  // Setiing user input of union Select from drop Down
   // void setSelectedUnion(value) {
   //   selectedUnionName = value;
   //   notifyListeners();
@@ -131,7 +134,8 @@ class RegistrationProvider extends ChangeNotifier {
 
   bool isRegistrationProccessCompleted() {
     bool isCompleted = false;
-    isCompleted = driverNameController.text != '' &&
+    isCompleted =
+        driverNameController.text != '' &&
         driverMobileNumberController.text != '' &&
         driverAddressController.text != '' &&
         bankPassBookProccessCompleted &&
@@ -146,45 +150,49 @@ class RegistrationProvider extends ChangeNotifier {
     return isCompleted;
   }
 
-///////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////
   /// Upload Driver Details Screen
-///////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////
 
-// Driver Requirments Id Numbers
-  TextEditingController bankPassBookOrCheckNumberController = TextEditingController();
-  TextEditingController policeClearenceCertificateOrJudgementCopyController = TextEditingController();
+  // Driver Requirments Id Numbers
+  TextEditingController bankPassBookOrCheckNumberController =
+      TextEditingController();
+  TextEditingController policeClearenceCertificateOrJudgementCopyController =
+      TextEditingController();
   TextEditingController aadhaarCardController = TextEditingController();
   TextEditingController panCardController = TextEditingController();
-// Vehicle Requirments Id Numbers
-  TextEditingController registrationCertificateController = TextEditingController();
+  // Vehicle Requirments Id Numbers
+  TextEditingController registrationCertificateController =
+      TextEditingController();
   TextEditingController vehicleInsuranceController = TextEditingController();
-  TextEditingController certificateOfFitnessController = TextEditingController();
+  TextEditingController certificateOfFitnessController =
+      TextEditingController();
   TextEditingController vehiclePermitController = TextEditingController();
-// Driver Requirments Images
+  // Driver Requirments Images
   File? bankPassBookImage;
   File? policeClearenceCertificateOrJudgementCopyImage;
   File? aadhaarCardFronSideImage;
   File? aadhaarCardBackSideImage;
   File? panCardImage;
-// Vehicle Requirements Images
+  // Vehicle Requirements Images
   File? registrationCertificateImage;
   File? vehicleInsuranceImage;
   File? certificateOfFitnessImage;
   File? vehiclePermitImage;
 
-// Driver Requirement Proccess is Completed
+  // Driver Requirement Proccess is Completed
   bool bankPassBookProccessCompleted = false;
   bool policeClearenceCertificateOrJudgementCopyProcessCompleted = false;
   bool aadhaarCardProcessCompleted = false;
   bool panCardProcessCompleted = false;
 
-// Vehicle Requirement Proccess is Completed
+  // Vehicle Requirement Proccess is Completed
   bool registrationCertificatedProccessCompleted = false;
   bool vehicleInsuranceProccessCompleted = false;
   bool certificateOfFitnessProccessCompleted = false;
   bool vehiclePermitProccessCompleted = false;
 
-// Driver and Requieements Image Picker
+  // Driver and Requieements Image Picker
   final ImagePicker _picker = ImagePicker();
   Future<void> pickImage(ImageSource source, int detaileNumber) async {
     final XFile? pickedFile = await _picker.pickImage(source: source);
@@ -194,7 +202,9 @@ class RegistrationProvider extends ChangeNotifier {
           bankPassBookImage = File(pickedFile.path);
           break;
         case 1:
-          policeClearenceCertificateOrJudgementCopyImage = File(pickedFile.path);
+          policeClearenceCertificateOrJudgementCopyImage = File(
+            pickedFile.path,
+          );
           break;
         case 2:
           aadhaarCardFronSideImage = File(pickedFile.path);
@@ -222,7 +232,10 @@ class RegistrationProvider extends ChangeNotifier {
     }
   }
 
-  void setDataAddingProcessComplete(int detaileNumber, BuildContext context) async {
+  void setDataAddingProcessComplete(
+    int detaileNumber,
+    BuildContext context,
+  ) async {
     switch (detaileNumber) {
       case 0:
         bankPassBookProccessCompleted = true;
@@ -256,9 +269,9 @@ class RegistrationProvider extends ChangeNotifier {
     Navigator.pop(context);
   }
 
-///////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////
   /// Select Payment Method Screen
-///////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////
 
   String isSelectedPaymentOption = "";
 

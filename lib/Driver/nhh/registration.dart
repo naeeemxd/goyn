@@ -96,7 +96,8 @@ class DriverRegistrationScreen extends StatelessWidget {
                                           "Police clearance certificate/Judgement copy",
                                           "Aadhaar card",
                                           "Pan card",
-                                          '',
+                                          "Profile Screen"
+                                              '',
                                           "Registration Certificate",
                                           "vehicle Insurance",
                                           "Certificate of fitness",
@@ -230,17 +231,17 @@ class DriverRegistrationScreen extends StatelessWidget {
       ),
       bottomNavigationBar: BottomAppBar(
         color: Colors.white,
-        height: height * 0.17,
+        height: height * 0.10,
         padding: EdgeInsets.symmetric(
           horizontal: width * 0.04,
-          vertical: height * 0.02,
+          vertical: height * 0.01,
         ),
         child: Column(
           children: [
             Consumer<RegistrationProvider>(
               builder:
                   (context, person, child) => CustomButton(
-                    title: 'Pay ₹250',
+                    title: 'Register',
                     color:
                         person.isRegistrationProccessCompleted()
                             ? yellow701

@@ -25,7 +25,7 @@ class LoginScreen extends StatelessWidget {
     try {
       final userDoc =
           await FirebaseFirestore.instance
-              .collection('users')
+              .collection('ADMINS')
               .doc(phoneNumber)
               .get();
 

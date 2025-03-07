@@ -6,12 +6,12 @@ import 'package:goyn/customwidgets.dart/Custom_Widgets.dart';
 import 'package:goyn/provider/DriverlistProvider.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DriverList extends StatefulWidget {
   const DriverList({super.key, this.union, this.unionDocId});
   final String? union;
-    final String? unionDocId;
-
+  final String? unionDocId;
 
   @override
   _DriverListState createState() => _DriverListState();
@@ -19,10 +19,14 @@ class DriverList extends StatefulWidget {
 
 class _DriverListState extends State<DriverList> {
   @override
+  @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () {
-      Provider.of<DriverlistProvider>(context, listen: false).fetchDrivers();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<DriverlistProvider>(
+        context,
+        listen: false,
+      ).fetchDrivers(widget.unionDocId);
     });
   }
 
@@ -32,7 +36,14 @@ class _DriverListState extends State<DriverList> {
       appBar: CustomAppBar(title: 'Union'),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          navigateTo(context, DriverRegistrationScreen(union: widget.union, ));
+          navigateTo(
+            context,
+            DriverRegistrationScreen(
+              union: widget.union,
+              unionDocId: widget.unionDocId,
+            ),
+          );
+          // print(widget.unionDocId);
         },
         backgroundColor: const Color(0xFFF0AC00),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -153,21 +164,14 @@ class _DriversList extends StatelessWidget {
     final driverProvider = Provider.of<DriverlistProvider>(context);
     final filteredDrivers = driverProvider.filteredDrivers;
 
-    if (filteredDrivers.isEmpty) {
-      return Center(child: Text("No drivers found"));
-    }
+    if (filteredDrivers.isEmpty) {}
 
     return ListView.builder(
       physics: BouncingScrollPhysics(),
       itemCount: filteredDrivers.length,
       itemBuilder: (context, index) {
         final driver = filteredDrivers[index];
-        return GestureDetector(
-          onTap: () {
-            navigateTo(context, DriverDetailsPage());
-          },
-          child: DriverCard(driver: driver),
-        );
+        return DriverCard(driver: driver);
       },
     );
   }
@@ -181,86 +185,95 @@ class DriverCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 82,
-      margin: EdgeInsets.symmetric(vertical: 5),
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 0.1, spreadRadius: 0.1),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 50, // Set a width for consistency
-            height: 50, // Set a height for consistency
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              image: DecorationImage(
-                image: NetworkImage(driver.imageUrl),
-                fit: BoxFit.cover, // Ensures image fills the container
+    return GestureDetector(
+      onTap: () {},
+      child: Container(
+        height: 82,
+        margin: EdgeInsets.symmetric(vertical: 5),
+        padding: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 0.1,
+              spreadRadius: 0.1,
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 50, // Set a width for consistency
+              height: 50, // Set a height for consistency
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                image: DecorationImage(
+                  image: NetworkImage(driver.imageUrl),
+                  fit: BoxFit.cover, // Ensures image fills the container
+                ),
+              ),
+              clipBehavior: Clip.hardEdge, // Prevents image overflow
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      driver.name,
+                      style: GoogleFonts.openSans(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      overflow: TextOverflow.ellipsis, // Prevents text overflow
+                      maxLines: 1,
+                    ),
+                    Text(
+                      driver.phone,
+                      style: GoogleFonts.openSans(
+                        fontSize: 15,
+                        color: Colors.grey,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ],
+                ),
               ),
             ),
-            clipBehavior: Clip.hardEdge, // Prevents image overflow
-          ),
-          SizedBox(width: 10),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    driver.name,
-                    style: GoogleFonts.openSans(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    overflow: TextOverflow.ellipsis, // Prevents text overflow
-                    maxLines: 1,
+            Row(
+              children: [
+                IconButton(
+                  icon: Image.asset(
+                    "assets/icons/Frame 1597882545.png",
+                    height: 35, // Reduced size for better alignment
+                    width: 35,
                   ),
-                  Text(
-                    driver.phone,
-                    style: GoogleFonts.openSans(
-                      fontSize: 15,
-                      color: Colors.grey,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+                  onPressed: () {
+                    // navigateTo(context, WhatsAppLauncher())
+                  },
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                ),
+                SizedBox(width: 8), // Added spacing
+                IconButton(
+                  icon: Image.asset(
+                    "assets/icons/phone_Icon.png",
+                    height: 35,
+                    width: 35,
                   ),
-                ],
-              ),
+                  onPressed: () {},
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                ),
+              ],
             ),
-          ),
-          Row(
-            children: [
-              IconButton(
-                icon: Image.asset(
-                  "assets/icons/Frame 1597882545.png",
-                  height: 35, // Reduced size for better alignment
-                  width: 35,
-                ),
-                onPressed: () {},
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-              ),
-              SizedBox(width: 8), // Added spacing
-              IconButton(
-                icon: Image.asset(
-                  "assets/icons/phone_Icon.png",
-                  height: 35,
-                  width: 35,
-                ),
-                onPressed: () {},
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
